@@ -18,9 +18,13 @@ class Database:
     def get_course_name(self, course_id):
         return self.cur.execute(f"SELECT name FROM course WHERE id = '{course_id}'").fetchone()[0]
 
-    def get_course_description(self, course_id):
-        return self.cur.execute(f"SELECT description FROM course WHERE id = '{course_id}'").fetchone()[0]
+    def get_course_full_description(self, course_id):
+        des_query = self.cur.execute(
+            f"SELECT short_description,description FROM course WHERE id = '{course_id}'").fetchone()
+        return des_query[0] + "\n\n" + des_query[1]
 
-    def get_course_id_by_name(self,course_name):
+    def get_course_short_description(self, course_id):
+        return self.cur.execute(f"SELECT short_description FROM course WHERE id = '{course_id}'").fetchone()[0]
+
+    def get_course_id_by_name(self, course_name):
         return self.cur.execute(f"SELECT id FROM course WHERE name = '{course_name}'").fetchone()[0]
-

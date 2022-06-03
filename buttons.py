@@ -2,9 +2,10 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 
 class Buttons:
     description_btn = KeyboardButton(text="📃 Описание курса")
-    program_btn = KeyboardButton(text="🕖 Программа курса")
+    program_btn = KeyboardButton(text="📆 Программа курса")
     buy_btn = KeyboardButton(text="💰 Оплатить курс")
     back_to_courses_btn = KeyboardButton(text="⬅ Список курсов")
+    connect_to_chat = KeyboardButton(text="💬 Подключиться к чату")
 
     def __init__(self, db):
         self.db = db
@@ -27,6 +28,12 @@ class Buttons:
         buttons = InlineKeyboardMarkup(row_width=2)
         buttons.insert(InlineKeyboardButton(text="Подтвердить", callback_data=f"Buy|Accept|{user_id}|{course_id}"))
         buttons.insert(InlineKeyboardButton(text="Отклонить", callback_data=f"Buy|Reject|{user_id}|{course_id}"))
+        return buttons
+
+    def get_buttons_after_payment(self):
+        buttons = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+        buttons.insert(self.connect_to_chat)
+        buttons.insert(self.back_to_courses_btn)
         return buttons
 
 

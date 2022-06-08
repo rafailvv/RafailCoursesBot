@@ -1,12 +1,12 @@
 from aiogram import Bot, Dispatcher
 from aiogram.dispatcher import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 
 from bot.buttons.buttons import Buttons
 from bot.database.db import Database
 from bot.message_texts.constans import SELECTED_FLOW_TEACHER_TEXT, CONNECT_TO_LINK, FLOW_LIST_TEXT, \
-    NOTIFICATION_STUDENT_START_LESSON_TEXT
-from bot.misc.states import States
+    NOTIFICATION_STUDENT_START_LESSON_TEXT, STUDENT_INFO_TEXT
+from bot.misc.states import MainStates
 
 
 class Teacher:
@@ -14,7 +14,14 @@ class Teacher:
         self.bot = bot
         self.db = db
         self.buttons = buttons
-        dp.register_message_handler(self.text_handler, state=States.teacher)
+        dp.register_message_handler(self.text_handler, state=MainStates.teacher)
+        dp.register_callback_query_handler(self.student_info, state=MainStates.teacher)
+
+
+    async def student_info(self,callback : CallbackQuery):
+        chat_id = callback.data
+        fio, username, phone = self.db.get_student_info(chat_id)
+        await callback.message.answer(text=STUDENT_INFO_TEXT.format(fio, username, phone))
 
     async def text_handler(self, message : Message, state : FSMContext):
         state_data = await state.get_data()
@@ -38,6 +45,7 @@ class Teacher:
 
         elif message.text == self.buttons.student_list_btn.text:
             await message.answer(text="Список учащихся 👇🏼", reply_markup=self.buttons.get_students_names_in_flow(state_data['flow_id']))
-
+        elif message.text == self.buttons.lesson_video_btn.text:
+            pass
         else:
             await message.answer("К сожалению, я вас не понимаю 😢")

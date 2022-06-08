@@ -4,7 +4,7 @@ from aiogram.types import Message, CallbackQuery
 
 from bot.buttons.buttons import Buttons
 from bot.database.db import Database
-from bot.message_texts.constans import SELECTED_FLOW_TEACHER_TEXT, CONNECT_TO_LINK, FLOW_LIST_TEXT, \
+from bot.message_texts.constans import SELECTED_FLOW_TEXT, CONNECT_TO_LINK, FLOW_LIST_TEXT, \
     NOTIFICATION_STUDENT_START_LESSON_TEXT, STUDENT_INFO_TEXT
 from bot.misc.states import MainStates
 
@@ -29,8 +29,8 @@ class Teacher:
             course_name, dates = message.text.split(" | ")[0], message.text.split(" | ")[1]
             start_date, finish_date = dates.split(" - ")[0], dates.split(" - ")[1]
             await state.update_data(flow_id = self.db.get_flow_id_by_course_and_date(course_name, start_date, finish_date, message.from_user.id))
-            await message.answer(text=SELECTED_FLOW_TEACHER_TEXT. format(message.text[2:]),
-                                 reply_markup=self.buttons.in_flow())
+            await message.answer(text=SELECTED_FLOW_TEXT. format(message.text[2:]),
+                                 reply_markup=self.buttons.in_flow_teacher())
         elif message.text == self.buttons.lesson_link_btn.text:
             await message.answer(text=CONNECT_TO_LINK,
                                  reply_markup=self.buttons.get_link_to_lesson(state_data['flow_id']))
@@ -46,6 +46,7 @@ class Teacher:
         elif message.text == self.buttons.student_list_btn.text:
             await message.answer(text="Список учащихся 👇🏼", reply_markup=self.buttons.get_students_names_in_flow(state_data['flow_id']))
         elif message.text == self.buttons.lesson_video_btn.text:
+            # TODO
             pass
         else:
             await message.answer("К сожалению, я вас не понимаю 😢")

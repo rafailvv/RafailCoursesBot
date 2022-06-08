@@ -27,8 +27,22 @@ class Database:
     def get_course_short_description(self, course_id):
         return self.cur.execute(f"SELECT short_description FROM course WHERE id = '{course_id}'").fetchone()[0]
 
-    def get_course_id_by_name(self, course_name):
-        return self.cur.execute(f"SELECT id FROM course WHERE name = '{course_name}'").fetchone()[0]
+    def get_near_course_by_name(self, course_name):
+        min_delta = -1
+        flows = self.cur.execute(f"""
+        SELECT course.id, course_flow.start_date
+        FROM course 
+        INNER JOIN course_flow on course.id = course_flow.course AND
+        course.name = '{course_name}'""").fetchall()
+
+        for course, flow_date in flows:
+            year, month, day = flow_date.split("-")
+            delta = (datetime(int(year), int(month), int(day)) - datetime.now()).days
+            if min_delta == -1 or (min_delta > delta >= 0):
+                min_delta = delta
+                course_id = course
+
+        return course_id, min_delta + 1
 
     def is_teacher(self, chat_id, useraname):
         id = self.cur.execute(f"SELECT id FROM teacher WHERE username = '@{useraname}'").fetchone()
@@ -79,21 +93,24 @@ class Database:
                         flow[2].split("-")[2] + "." + flow[2].split("-")[1] + "." + flow[2].split("-")[0]))
         return res
 
-    def get_near_flow_delta_by_course_id(self, id):
+    def get_near_course_flow_by_course_id(self, id):
         min_delta = -1
-        for flow_date in self.cur.execute(
-                f"SELECT start_date FROM course_flow WHERE course = {id} AND student_count < 7").fetchall():
-            year, month, day = flow_date[0].split("-")
+
+        for course_flow, flow_date in self.cur.execute(
+                f"SELECT id, start_date FROM course_flow WHERE course = {id} AND student_count < 7").fetchall():
+            year, month, day = flow_date.split("-")
             delta = (datetime(int(year), int(month), int(day)) - datetime.now()).days
             if min_delta == -1 or (min_delta > delta >= 0):
                 min_delta = delta
-        return min_delta + 1
+                course_flow_id = course_flow
+        return course_flow_id
 
     def get_flow_id_by_course_and_date(self, course_name, start_date, finish_date, teacher_chat_id):
+        #TODO check if such flow for student
+
         return self.cur.execute(f"""
             SELECT id FROM course_flow 
             WHERE course = (SELECT id FROM course WHERE name = '{course_name}') AND
-                teacher = (SELECT id FROM teacher WHERE chat_id = {teacher_chat_id}) AND 
                 start_date = '{datetime(int(start_date.split(".")[2]),
                                         int(start_date.split(".")[1]),
                                         int(start_date.split(".")[0])).date()}' AND 
@@ -150,4 +167,7 @@ class Database:
         if chat_id is not None:
             return chat_id[0]
         return None
+
+    def get_timetable_by_flow_id(self, id):
+        return self.cur.execute(f"SELECT timetable FROM course_flow WHERE id = {id}").fetchone()[0]
 

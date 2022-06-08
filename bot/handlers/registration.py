@@ -66,7 +66,7 @@ class Registration:
                 if state_data['username'] == callback.message.chat.username:
                     chat_id = callback.message.chat.id
                 self.db.add_student(state_data['fio'], state_data['phone'], state_data['username'],
-                                          state_data['course_id'], chat_id)
+                                          self.db.get_near_course_flow_by_course_id(state_data['course_id']), chat_id)
 
                 await callback.message.answer(
                     text=BUY_COURSE_TEXT.format(self.db.get_course_name(state_data['course_id'])[2:]))
@@ -91,8 +91,8 @@ class Registration:
     async def text_handler(self, message: Message, state: FSMContext):
         current_data = await state.get_data()
         if message.text in self.db.get_courses_name():
-            await state.update_data(course_id=self.db.get_course_id_by_name(message.text))
-            delta = self.db.get_near_flow_delta_by_course_id(self.db.get_course_id_by_name(message.text))
+            course_id, delta = self.db.get_near_course_by_name(message.text)
+            await state.update_data(course_id=course_id)
             await message.answer(text=COURSE_TEXT.format(message.text[2:], delta, self.get_ending_word_day(delta)),
                                  reply_markup=self.buttons.in_course())
         elif message.text == self.buttons.description_btn.text:
@@ -123,6 +123,7 @@ class Registration:
             await message.answer(text=STUDENT_START_TEXT.format(self.db.get_student_name_by_chat_id(message.chat.id)),
                                  reply_markup=self.buttons.get_flow_for_student(
                                      self.db.get_student_id_by_chat_id(message.chat.id)))
+            await state.update_data(flow_id=None)
             await MainStates.student.set()
         else:
             await message.answer("К сожалению, я вас не понимаю 😢")
@@ -135,21 +136,27 @@ class Registration:
             await self.text_handler(message, state)
         else:
             if cur_state == PersonalInfo.fio.state:
-                await state.update_data(fio=message.text)
-                await message.answer(text="📲 Введите номер телефона учащегося")
-                await PersonalInfo.phone.set()
+                if len(message.text.split()) in [2,3]:
+                    await state.update_data(fio=message.text)
+                    await message.answer(text="📲 Введите номер телефона учащегося")
+                    await PersonalInfo.phone.set()
+                else:
+                    await message.answer(text="❗Введите Фамилию Имя и Отчество (отчество необязательно)❗")
             elif cur_state == PersonalInfo.phone.state:
                 await state.update_data(phone=message.text)
                 await message.answer(text="🔑 Введите ник учащегося (без знака @)",
                                      reply_markup=self.buttons.how_find_username())
                 await PersonalInfo.username.set()
             elif cur_state == PersonalInfo.username.state:
-                await state.update_data(username=message.text.lower())
-                corr_pi_msg = await message.answer(
-                    text=CORRECTNESS_PERSONAL_INFO.format(data['fio'], data['phone'], message.text.lower()),
-                    reply_markup=self.buttons.edit_personal_info())
-                await state.update_data(corr_pi_msg=corr_pi_msg)
-                await PersonalInfo.check_info.set()
+                if '@' in message.text:
+                    await message.answer(text="❗Без знака @❗")
+                else:
+                    await state.update_data(username=message.text)
+                    corr_pi_msg = await message.answer(
+                        text=CORRECTNESS_PERSONAL_INFO.format(data['fio'], data['phone'], message.text),
+                        reply_markup=self.buttons.edit_personal_info())
+                    await state.update_data(corr_pi_msg=corr_pi_msg)
+                    await PersonalInfo.check_info.set()
 
     async def editing_personal_info(self, message: Message, state: FSMContext):
         cur_state = await state.get_state()
@@ -158,12 +165,17 @@ class Registration:
             await self.text_handler(message, state)
         else:
             if cur_state == PersonalInfo.edit_fio.state:
-                await state.update_data(fio=message.text)
+                if len(message.text.split()) in [2, 3]:
+                    await state.update_data(fio=message.text)
+                else:
+                    await message.answer(text="❗Введите Фамилию Имя и Отчество (отчество необязательно)❗")
             elif cur_state == PersonalInfo.edit_phone.state:
                 await state.update_data(phone=message.text)
             elif cur_state == PersonalInfo.edit_username.state:
-                await state.update_data(username=message.text)
-
+                if '@' in message.text:
+                    await message.answer(text="❗Без знака @❗")
+                else:
+                    await state.update_data(username=message.text)
             data = await state.get_data()
             await self.bot.edit_message_text(
                 chat_id=message.chat.id,

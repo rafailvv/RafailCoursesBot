@@ -10,8 +10,10 @@ class Buttons:
 
     lesson_link_btn = KeyboardButton(text="🔉 Подключиться к занятию")
     student_list_btn = KeyboardButton(text = "👨‍🎓 Список учащихся")
-    lesson_video_btn = KeyboardButton(text= "🎥 Запись урока")
+    lesson_video_btn = KeyboardButton(text= "🎥 Запись уроков")
     back_to_flow_btn = KeyboardButton(text="⬅ Список потоков")
+
+    teacher_info_btn = KeyboardButton(text="👨‍🎓 Информация о преподавателе")
 
     student_account_btn = KeyboardButton(text = "👨‍🎓 Перейти в аккаунт студента")
 
@@ -56,11 +58,19 @@ class Buttons:
             buttons.insert(KeyboardButton(text=f"{name} | {start_date} - {finish_date}"))
         return buttons
 
-    def in_flow(self):
+    def in_flow_teacher(self):
         buttons = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         buttons.insert(self.lesson_link_btn)
         buttons.insert(self.lesson_video_btn)
         buttons.insert(self.student_list_btn)
+        buttons.add(self.back_to_flow_btn)
+        return buttons
+
+    def in_flow_student(self):
+        buttons = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+        buttons.insert(self.lesson_link_btn)
+        buttons.insert(self.lesson_video_btn)
+        buttons.insert(self.teacher_info_btn)
         buttons.add(self.back_to_flow_btn)
         return buttons
 

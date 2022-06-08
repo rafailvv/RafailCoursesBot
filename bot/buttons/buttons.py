@@ -13,6 +13,8 @@ class Buttons:
     lesson_video_btn = KeyboardButton(text= "🎥 Запись урока")
     back_to_flow_btn = KeyboardButton(text="⬅ Список потоков")
 
+    student_account_btn = KeyboardButton(text = "👨‍🎓 Перейти в аккаунт студента")
+
     def __init__(self, db):
         self.db = db
 
@@ -84,5 +86,10 @@ class Buttons:
         buttons.insert(InlineKeyboardButton("✏ Изменить номер телефона", callback_data="PersInfo|phone"))
         buttons.insert(InlineKeyboardButton("✏ Изменить ник", callback_data="PersInfo|username"))
         buttons.insert(InlineKeyboardButton("✅ Подтвердить", callback_data="PersInfo|accept"))
+        return buttons
+
+    def get_button_to_student_page(self):
+        buttons = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+        buttons.insert(self.student_account_btn)
         return buttons
 

@@ -62,8 +62,8 @@ class Database:
             INNER JOIN course c on course_flow.course = c.id AND teacher = {teacher_id}""").fetchall()
         for flow in flows:
             res.append((flow[0],
-                        flow[1].split("-")[2] + "." + flow[1].split("-")[1] +  "." + flow[1].split("-")[0],
-                        flow[2].split("-")[2] + "." + flow[2].split("-")[1] +  "." + flow[2].split("-")[0] ))
+                        flow[1].split("-")[2] + "." + flow[1].split("-")[1] + "." + flow[1].split("-")[0],
+                        flow[2].split("-")[2] + "." + flow[2].split("-")[1] + "." + flow[2].split("-")[0]))
         return res
 
     def get_current_flows_for_student(self, student_id):
@@ -75,14 +75,14 @@ class Database:
             INNER JOIN student s on course_flow.id = s.course_flow AND s.id = {student_id}""").fetchall()
         for flow in flows:
             res.append((flow[0],
-                        flow[1].split("-")[2] + "." + flow[1].split("-")[1] +  "." + flow[1].split("-")[0],
-                        flow[2].split("-")[2] + "." + flow[2].split("-")[1] +  "." + flow[2].split("-")[0] ))
+                        flow[1].split("-")[2] + "." + flow[1].split("-")[1] + "." + flow[1].split("-")[0],
+                        flow[2].split("-")[2] + "." + flow[2].split("-")[1] + "." + flow[2].split("-")[0]))
         return res
-
 
     def get_near_flow_delta_by_course_id(self, id):
         min_delta = -1
-        for flow_date in self.cur.execute(f"SELECT start_date FROM course_flow WHERE course = {id} AND student_count < 7").fetchall():
+        for flow_date in self.cur.execute(
+                f"SELECT start_date FROM course_flow WHERE course = {id} AND student_count < 7").fetchall():
             year, month, day = flow_date[0].split("-")
             delta = (datetime(int(year), int(month), int(day)) - datetime.now()).days
             if min_delta == -1 or (min_delta > delta >= 0):
@@ -95,41 +95,47 @@ class Database:
             WHERE course = (SELECT id FROM course WHERE name = '{course_name}') AND
                 teacher = (SELECT id FROM teacher WHERE chat_id = {teacher_chat_id}) AND 
                 start_date = '{datetime(int(start_date.split(".")[2]),
-                                        int(start_date.split(".")[1]), 
-                                        int(start_date.split(".")[0])).date() }' AND 
+                                        int(start_date.split(".")[1]),
+                                        int(start_date.split(".")[0])).date()}' AND 
                 finish_date = '{datetime(int(finish_date.split(".")[2]),
                                          int(finish_date.split(".")[1]),
-                                         int(finish_date.split(".")[0])).date() }'""").fetchone()[0]
+                                         int(finish_date.split(".")[0])).date()}'""").fetchone()[0]
 
     def get_link_by_flow_id(self, id):
         return self.cur.execute(f"SELECT lesson_link FROM course_flow WHERE id = {id}").fetchone()[0]
 
-    def get_list_students_by_flow_id (self, id):
-        return self.cur.execute(f"SELECT full_name, chat_id FROM student WHERE course_flow = {id} AND is_approved = 1").fetchall()
+    def get_list_students_by_flow_id(self, id):
+        return self.cur.execute(
+            f"SELECT full_name, chat_id FROM student WHERE course_flow = {id} AND is_approved = 1").fetchall()
 
     def get_chat_id_students_in_flow(self, id):
         return self.cur.execute(f"SELECT chat_id FROM student WHERE course_flow = {id} AND is_approved = 1").fetchall()
 
-
     def get_student_info(self, chat_id):
         return self.cur.execute(f"SELECT full_name, username, phone FROM student WHERE chat_id = {chat_id}").fetchone()
 
-    def add_student(self, full_name, phone, username, course_flow):
-        self.cur.execute(f"""INSERT INTO student(username, full_name, phone, course_flow) 
-                                VALUES ('@{username}', '{full_name}', '{phone}', '{course_flow}')""")
+    def add_student(self, full_name, phone, username, course_flow, chat_id):
+        if chat_id is None:
+            self.cur.execute(f"""INSERT INTO student(username, full_name, phone, course_flow) 
+                                    VALUES ('@{username}', '{full_name}', '{phone}', '{course_flow}')""")
+        else:
+            self.cur.execute(f"""INSERT INTO student(username, full_name, phone, course_flow, chat_id) 
+                                                VALUES ('@{username}', '{full_name}', '{phone}', '{course_flow}', {chat_id})""")
         self.db.commit()
 
     def get_teacher_name_by_chat_id(self, chat_id):
-        teacher_name = self.cur.execute(f"SELECT full_name FROM teacher WHERE chat_id = {chat_id}").fetchone()[0].split()
+        teacher_name = self.cur.execute(f"SELECT full_name FROM teacher WHERE chat_id = {chat_id}").fetchone()[
+            0].split()
         if teacher_name is not None:
             return teacher_name[1]
 
     def get_student_name_by_chat_id(self, chat_id):
-        student_name = self.cur.execute(f"SELECT full_name FROM student WHERE chat_id = {chat_id}").fetchone()[0].split()
+        student_name = self.cur.execute(f"SELECT full_name FROM student WHERE chat_id = {chat_id}").fetchone()[
+            0].split()
         if student_name is not None:
             return student_name[1]
 
-    def update_confirmation(self, student_id, is_approved = False):
+    def update_confirmation(self, student_id, is_approved=False):
         if not is_approved:
             self.cur.execute(f"DELETE FROM student WHERE id = {student_id}")
         else:
@@ -138,3 +144,10 @@ class Database:
 
     def get_student_id_by_username(self, username):
         return self.cur.execute(f"SELECT id FROM student WHERE username = '@{username}'").fetchone()[0]
+
+    def get_student_chat_id_by_id(self, id):
+        chat_id = self.cur.execute(f"SELECT chat_id FROM student WHERE id = {id}").fetchone()
+        if chat_id is not None:
+            return chat_id[0]
+        return None
+

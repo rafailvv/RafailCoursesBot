@@ -6,7 +6,7 @@ from bot.buttons.buttons import Buttons
 from bot.message_texts.constans import START_TEXT, COURSE_TEXT, COURSES_LIST, BUY_COURSE_TEXT, ID_RAFAIL, \
     INFO_FOR_BUY_COURSE, \
     REJECTED_TEXT, ACCEPTED_TEXT, SUCCESSFUL_PAYMENT_TEXT, SUCCESSFUL_PAYMENT_INFO_FOR_ADMIN, TEACHER_START_TEXT, \
-    CORRECTNESS_PERSONAL_INFO
+    CORRECTNESS_PERSONAL_INFO, STUDENT_START_TEXT
 from bot.database.db import Database
 from bot.misc.states import MainStates, PersonalInfo
 
@@ -37,12 +37,16 @@ class Registration:
                 await self.bot.send_message(chat_id=data[2],
                                             text=REJECTED_TEXT.format(self.db.get_course_name(data[3])[2:]))
                 self.db.update_confirmation(data[4])
-
             if data[1] == "Accept":
-                await self.bot.send_message(chat_id=data[2],
-                                            text=ACCEPTED_TEXT.format(self.db.get_course_name(data[3])[2:]))
+                if self.db.get_student_chat_id_by_id(data[4]) is not None:
+                    await self.bot.send_message(chat_id=data[2],
+                                                text=ACCEPTED_TEXT.format(self.db.get_course_name(data[3])[2:]),
+                                                reply_markup=self.buttons.get_button_to_student_page())
+                else:
+                    await self.bot.send_message(chat_id=data[2],
+                                                text=ACCEPTED_TEXT.format(self.db.get_course_name(data[3])[2:]))
                 self.db.update_confirmation(data[4], True)
-            # await MainStates.registration.set()
+
         elif data[0] == "PersInfo":
             if data[1] == "fio":
                 await callback.message.answer(text="🔡 Введите ФИО учащегося")
@@ -58,8 +62,11 @@ class Registration:
                 await self.bot.delete_message(chat_id=callback.message.chat.id, message_id=state_data['corr_pi_msg'].message_id)
                 await callback.message.answer("✅ Данные подтверждены!")
 
+                chat_id = None
+                if state_data['username'] == callback.message.chat.username:
+                    chat_id = callback.message.chat.id
                 self.db.add_student(state_data['fio'], state_data['phone'], state_data['username'],
-                                          state_data['course_id'])
+                                          state_data['course_id'], chat_id)
 
                 await callback.message.answer(
                     text=BUY_COURSE_TEXT.format(self.db.get_course_name(state_data['course_id'])[2:]))
@@ -112,6 +119,11 @@ class Registration:
             await message.answer(text=COURSES_LIST,
                                  reply_markup=self.buttons.get_courses_buttons())
             await state.update_data(id=None)
+        elif message.text == self.buttons.student_account_btn.text:
+            await message.answer(text=STUDENT_START_TEXT.format(self.db.get_student_name_by_chat_id(message.chat.id)),
+                                 reply_markup=self.buttons.get_flow_for_student(
+                                     self.db.get_student_id_by_chat_id(message.chat.id)))
+            await MainStates.student.set()
         else:
             await message.answer("К сожалению, я вас не понимаю 😢")
 
@@ -132,9 +144,9 @@ class Registration:
                                      reply_markup=self.buttons.how_find_username())
                 await PersonalInfo.username.set()
             elif cur_state == PersonalInfo.username.state:
-                await state.update_data(username=message.text)
+                await state.update_data(username=message.text.lower())
                 corr_pi_msg = await message.answer(
-                    text=CORRECTNESS_PERSONAL_INFO.format(data['fio'], data['phone'], message.text),
+                    text=CORRECTNESS_PERSONAL_INFO.format(data['fio'], data['phone'], message.text.lower()),
                     reply_markup=self.buttons.edit_personal_info())
                 await state.update_data(corr_pi_msg=corr_pi_msg)
                 await PersonalInfo.check_info.set()

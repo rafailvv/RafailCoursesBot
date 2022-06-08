@@ -25,7 +25,6 @@ class Start:
             await message.answer(text=STUDENT_START_TEXT.format(self.db.get_student_name_by_chat_id(message.chat.id)),
                                  reply_markup=self.buttons.get_flow_for_student(
                                      self.db.get_student_id_by_chat_id(message.chat.id)))
-            await MainStates.student.set()
         else:
             await self.bot.send_photo(chat_id=message.chat.id,
                              photo=open('bot/image/rafail.png', 'rb'),

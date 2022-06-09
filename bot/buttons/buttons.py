@@ -9,29 +9,35 @@ class Buttons:
     connect_to_chat = KeyboardButton(text="💬 Подключиться к чату")
 
     lesson_link_btn = KeyboardButton(text="🔉 Подключиться к занятию")
-    student_list_btn = KeyboardButton(text = "👨‍🎓 Список учащихся")
-    lesson_video_btn = KeyboardButton(text= "🎥 Запись уроков")
+    lesson_video_btn = KeyboardButton(text= "🎥 Записи уроков")
+    student_list_btn = KeyboardButton(text="👨‍🎓 Список учащихся")
+    check_homework_btn = KeyboardButton(text = "💌 Проверить домашнее задание")
     back_to_flow_btn = KeyboardButton(text="⬅ Список потоков")
 
-    teacher_info_btn = KeyboardButton(text="👨‍🎓 Информация о преподавателе")
+    teacher_info_btn = KeyboardButton(text="👨‍🏫 Связаться с преподавателем")
 
-    student_account_btn = KeyboardButton(text = "👨‍🎓 Перейти в аккаунт студента")
+    student_account_btn = KeyboardButton(text = "👨‍🎓 Перейти в кабинет студента")
+    send_homework_btn = KeyboardButton(text = "📩 Отправить домашнее задание")
 
     def __init__(self, db):
         self.db = db
 
-    def get_courses_buttons(self):
+    def get_courses_buttons(self, is_student = False):
         buttons = ReplyKeyboardMarkup(resize_keyboard=True,row_width=2)
         for course_name in self.db.get_courses_name():
             buttons.insert(KeyboardButton(text=course_name))
+        if is_student:
+            buttons.add(self.student_account_btn)
         return buttons
 
-    def in_course(self):
+    def in_course(self, is_student):
         buttons = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         buttons.insert(self.description_btn)
         buttons.insert(self.program_btn)
         buttons.insert(self.buy_btn)
         buttons.add(self.back_to_courses_btn)
+        if is_student:
+            buttons.add(self.student_account_btn)
         return buttons
 
     def get_confirm_and_reject(self, chat_id, course_id, student_id):
@@ -56,6 +62,7 @@ class Buttons:
         buttons = ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
         for name, start_date, finish_date in self.db.get_current_flows_for_student(id):
             buttons.insert(KeyboardButton(text=f"{name} | {start_date} - {finish_date}"))
+        buttons.insert(self.back_to_courses_btn)
         return buttons
 
     def in_flow_teacher(self):
@@ -63,6 +70,7 @@ class Buttons:
         buttons.insert(self.lesson_link_btn)
         buttons.insert(self.lesson_video_btn)
         buttons.insert(self.student_list_btn)
+        buttons.insert(self.check_homework_btn)
         buttons.add(self.back_to_flow_btn)
         return buttons
 
@@ -71,6 +79,7 @@ class Buttons:
         buttons.insert(self.lesson_link_btn)
         buttons.insert(self.lesson_video_btn)
         buttons.insert(self.teacher_info_btn)
+        buttons.insert(self.send_homework_btn)
         buttons.add(self.back_to_flow_btn)
         return buttons
 

@@ -4,8 +4,8 @@ from aiogram.types import Message, CallbackQuery
 
 from bot.buttons.buttons import Buttons
 from bot.database.db import Database
-from bot.message_texts.constans import SELECTED_FLOW_TEXT, CONNECT_TO_LINK, FLOW_LIST_TEXT, \
-    NOTIFICATION_STUDENT_START_LESSON_TEXT, STUDENT_INFO_TEXT
+from bot.message_texts.constans import SELECTED_FLOW_TEXT, CONNECT_TO_LINK_TEACHER, FLOW_LIST_TEXT, \
+    NOTIFICATION_STUDENT_START_LESSON_TEXT, PERSON_INFO_TEXT
 from bot.misc.states import MainStates
 
 
@@ -18,10 +18,10 @@ class Teacher:
         dp.register_callback_query_handler(self.student_info, state=MainStates.teacher)
 
 
-    async def student_info(self,callback : CallbackQuery):
+    async def student_info(self, callback : CallbackQuery):
         chat_id = callback.data
         fio, username, phone = self.db.get_student_info(chat_id)
-        await callback.message.answer(text=STUDENT_INFO_TEXT.format(fio, username, phone))
+        await callback.message.answer(text=PERSON_INFO_TEXT.format("👨‍🎓",fio, username, phone))
 
     async def text_handler(self, message : Message, state : FSMContext):
         state_data = await state.get_data()
@@ -32,7 +32,7 @@ class Teacher:
             await message.answer(text=SELECTED_FLOW_TEXT. format(message.text[2:]),
                                  reply_markup=self.buttons.in_flow_teacher())
         elif message.text == self.buttons.lesson_link_btn.text:
-            await message.answer(text=CONNECT_TO_LINK,
+            await message.answer(text=CONNECT_TO_LINK_TEACHER,
                                  reply_markup=self.buttons.get_link_to_lesson(state_data['flow_id']))
             for student_chat_id in self.db.get_chat_id_students_in_flow(state_data['flow_id']):
                 await self.bot.send_message(chat_id=student_chat_id[0],
@@ -48,5 +48,8 @@ class Teacher:
         elif message.text == self.buttons.lesson_video_btn.text:
             # TODO
             pass
+        elif message.text == self.buttons.check_homework_btn.text:
+            # TODO
+            pass
         else:
-            await message.answer("К сожалению, я вас не понимаю 😢")
+            await message.answer("К сожалению, я тебя не понимаю 😢")

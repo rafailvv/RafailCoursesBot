@@ -28,7 +28,7 @@ class Database:
         return self.cur.execute(f"SELECT short_description FROM course WHERE id = '{course_id}'").fetchone()[0]
 
     def get_near_course_by_name(self, course_name):
-        min_delta = -1
+        min_delta = 365
         flows = self.cur.execute(f"""
         SELECT course.id, course_flow.start_date
         FROM course 
@@ -38,7 +38,7 @@ class Database:
         for course, flow_date in flows:
             year, month, day = flow_date.split("-")
             delta = (datetime(int(year), int(month), int(day)) - datetime.now()).days
-            if min_delta == -1 or (min_delta > delta >= 0):
+            if min_delta > delta >= 0:
                 min_delta = delta
                 course_id = course
 
@@ -73,7 +73,7 @@ class Database:
         flows = self.cur.execute(f"""
             SELECT name, start_date, finish_date 
             FROM course_flow 
-            INNER JOIN course c on course_flow.course = c.id AND teacher = {teacher_id}""").fetchall()
+            INNER JOIN course c on course_flow.course = c.id AND course_flow.teacher = {teacher_id} """).fetchall()
         for flow in flows:
             res.append((flow[0],
                         flow[1].split("-")[2] + "." + flow[1].split("-")[1] + "." + flow[1].split("-")[0],
@@ -106,7 +106,7 @@ class Database:
         return course_flow_id
 
     def get_flow_id_by_course_and_date(self, course_name, start_date, finish_date, teacher_chat_id):
-        #TODO check if such flow for student
+        # TODO check if such flow for student
 
         return self.cur.execute(f"""
             SELECT id FROM course_flow 
@@ -126,18 +126,18 @@ class Database:
             f"SELECT full_name, chat_id FROM student WHERE course_flow = {id} AND is_approved = 1").fetchall()
 
     def get_chat_id_students_in_flow(self, id):
-        return self.cur.execute(f"SELECT chat_id FROM student WHERE course_flow = {id} AND is_approved = 1").fetchall()
-
+        a = self.cur.execute(f"SELECT chat_id FROM student WHERE course_flow = {id} AND is_approved = 1").fetchall()
+        return a
     def get_student_info(self, chat_id):
-        return self.cur.execute(f"SELECT full_name, username, phone FROM student WHERE chat_id = {chat_id}").fetchone()
+        return self.cur.execute(f"SELECT full_name, username, phone FROM student WHERE chat_id = {chat_id} AND is_approved = 1").fetchone()
 
     def add_student(self, full_name, phone, username, course_flow, chat_id):
         if chat_id is None:
             self.cur.execute(f"""INSERT INTO student(username, full_name, phone, course_flow) 
-                                    VALUES ('@{username}', '{full_name}', '{phone}', '{course_flow}')""")
+                                    VALUES ('@{username}', '{full_name}', '{phone}', {course_flow})""")
         else:
             self.cur.execute(f"""INSERT INTO student(username, full_name, phone, course_flow, chat_id) 
-                                                VALUES ('@{username}', '{full_name}', '{phone}', '{course_flow}', {chat_id})""")
+                                                VALUES ('@{username}', '{full_name}', '{phone}', {course_flow}, {chat_id})""")
         self.db.commit()
 
     def get_teacher_name_by_chat_id(self, chat_id):
@@ -157,6 +157,8 @@ class Database:
             self.cur.execute(f"DELETE FROM student WHERE id = {student_id}")
         else:
             self.cur.execute(f"UPDATE student SET is_approved = 1 WHERE id = {student_id}")
+            self.cur.execute(f"""UPDATE course_flow SET student_count = student_count + 1 WHERE id = 
+                    (SELECT course_flow FROM student WHERE id = {student_id})""")
         self.db.commit()
 
     def get_student_id_by_username(self, username):
@@ -170,4 +172,13 @@ class Database:
 
     def get_timetable_by_flow_id(self, id):
         return self.cur.execute(f"SELECT timetable FROM course_flow WHERE id = {id}").fetchone()[0]
+
+    def check_if_is_student(self, chat_id):
+        if self.cur.execute(f"""SELECT id FROM student WHERE chat_id = {chat_id}""").fetchone() is None:
+            return False
+        return True
+
+    def get_teacher_info(self, flow_id):
+        return self.cur.execute(f"""SELECT full_name, username, phone FROM course_flow, teacher 
+                        WHERE course_flow.id = {flow_id} AND teacher.id = course_flow.teacher""").fetchone()
 

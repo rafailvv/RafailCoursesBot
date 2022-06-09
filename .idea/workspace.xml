@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8ee54b20-319a-4727-bcb2-c2e45757609a" name="Changes" comment="Draft with done registration">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="8ee54b20-319a-4727-bcb2-c2e45757609a" name="Changes" comment="Draft with start student panel">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/5159b744-8c7e-4915-89ae-49bb5abbd913.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot/buttons/buttons.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/buttons/buttons.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot/database/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/database/db.py" afterDir="false" />
@@ -15,7 +17,6 @@
       <change beforePath="$PROJECT_DIR$/bot/handlers/student.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/handlers/student.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot/handlers/teacher.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/handlers/teacher.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot/message_texts/constans.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/message_texts/constans.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,19 +42,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "WebServerToolWindowFactoryState": "false",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.tabs&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "sqlite"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlite&quot;
+    ],
+    &quot;com.intellij.ide.scratch.LRUPopupBuilder$1/&quot;: [
+      &quot;SQLite&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\rafai\PycharmProjects\RafailCoursesBot" />
@@ -202,8 +207,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
-        <item itemvalue="Python.start" />
         <item itemvalue="Python.teacher" />
+        <item itemvalue="Python.start" />
         <item itemvalue="Python.registration" />
         <item itemvalue="Python.db (1)" />
       </list>
@@ -234,7 +239,12 @@
       <workItem from="1654672681209" duration="58000" />
       <workItem from="1654673593650" duration="8053000" />
       <workItem from="1654690882456" duration="6518000" />
-      <workItem from="1654712426531" duration="3678000" />
+      <workItem from="1654712426531" duration="3718000" />
+      <workItem from="1654749135176" duration="4575000" />
+      <workItem from="1654772776804" duration="3118000" />
+      <workItem from="1654787732780" duration="1836000" />
+      <workItem from="1654797552838" duration="4160000" />
+      <workItem from="1654804261451" duration="705000" />
     </task>
     <task id="LOCAL-00001" summary="Draft without payment">
       <created>1654281465351</created>
@@ -257,7 +267,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654532295889</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Draft with start student panel">
+      <created>1654717279140</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1654717279140</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -279,32 +296,48 @@
     <MESSAGE value="Draft with payment" />
     <MESSAGE value="Draft with teacher account" />
     <MESSAGE value="Draft with done registration" />
-    <option name="LAST_COMMIT_MESSAGE" value="Draft with done registration" />
+    <MESSAGE value="Draft with start student panel" />
+    <option name="LAST_COMMIT_MESSAGE" value="Draft with start student panel" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/bot/handlers/registration.py</url>
-          <line>83</line>
+          <line>85</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/bot/handlers/student.py</url>
-          <line>19</line>
+          <line>25</line>
           <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/bot/database/db.py</url>
+          <line>37</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/bot/handlers/teacher.py</url>
+          <line>22</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/bot/handlers/teacher.py</url>
+          <line>23</line>
+          <option name="timeStamp" value="13" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/RafailCoursesBot$database.coverage" NAME="database Coverage Results" MODIFIED="1654252169434" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/RafailCoursesBot$main.coverage" NAME="main Coverage Results" MODIFIED="1654717245501" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/RafailCoursesBot$main.coverage" NAME="main Coverage Results" MODIFIED="1654804886104" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/RafailCoursesBot$db__1_.coverage" NAME="db (1) Coverage Results" MODIFIED="1654513381844" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bot/database" />
     <SUITE FILE_PATH="coverage/RafailCoursesBot$registration.coverage" NAME="registration Coverage Results" MODIFIED="1654515379392" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bot/handlers" />
     <SUITE FILE_PATH="coverage/RafailCoursesBot$start.coverage" NAME="start Coverage Results" MODIFIED="1654590400497" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bot/handlers" />
     <SUITE FILE_PATH="coverage/RafailCoursesBot$constans.coverage" NAME="constans Coverage Results" MODIFIED="1654246101783" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/RafailCoursesBot$config.coverage" NAME="config Coverage Results" MODIFIED="1654500936347" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bot" />
-    <SUITE FILE_PATH="coverage/RafailCoursesBot$teacher.coverage" NAME="teacher Coverage Results" MODIFIED="1654523421730" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bot/handlers" />
+    <SUITE FILE_PATH="coverage/RafailCoursesBot$teacher.coverage" NAME="teacher Coverage Results" MODIFIED="1654801032571" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bot/handlers" />
   </component>
 </project>

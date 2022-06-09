@@ -17,7 +17,9 @@ class Registration:
         self.db = db
         self.buttons = buttons
         dp.register_callback_query_handler(self.registration_confirmation,
-                                           state="*")
+                                           state=[MainStates.registration,
+                                                  PersonalInfo.check_info, PersonalInfo.username, PersonalInfo.phone,
+                                                  PersonalInfo.fio, PersonalInfo.edit_fio, PersonalInfo.edit_phone, PersonalInfo.edit_username])
         dp.register_message_handler(self.text_handler, state=MainStates.registration)
         dp.register_message_handler(self.personal_info,
                                     state=[PersonalInfo.fio, PersonalInfo.phone, PersonalInfo.username])
@@ -94,7 +96,7 @@ class Registration:
             course_id, delta = self.db.get_near_course_by_name(message.text)
             await state.update_data(course_id=course_id)
             await message.answer(text=COURSE_TEXT.format(message.text[2:], delta, self.get_ending_word_day(delta)),
-                                 reply_markup=self.buttons.in_course())
+                                 reply_markup=self.buttons.in_course(self.db.check_if_is_student(message.chat.id)))
         elif message.text == self.buttons.description_btn.text:
             await message.answer(text=self.db.get_course_full_description(current_data['course_id']))
         elif message.text == self.buttons.program_btn.text:
@@ -117,7 +119,7 @@ class Registration:
             #                        )
         elif message.text == self.buttons.back_to_courses_btn.text:
             await message.answer(text=COURSES_LIST,
-                                 reply_markup=self.buttons.get_courses_buttons())
+                                 reply_markup=self.buttons.get_courses_buttons(self.db.check_if_is_student(message.chat.id)))
             await state.update_data(id=None)
         elif message.text == self.buttons.student_account_btn.text:
             await message.answer(text=STUDENT_START_TEXT.format(self.db.get_student_name_by_chat_id(message.chat.id)),
@@ -132,7 +134,7 @@ class Registration:
         cur_state = await state.get_state()
         data = await state.get_data()
         if message.text in [self.buttons.description_btn.text, self.buttons.program_btn.text, self.buttons.buy_btn.text,
-                            self.buttons.back_to_courses_btn.text]:
+                            self.buttons.back_to_courses_btn.text, self.buttons.student_account_btn.text] + self.db.get_courses_name():
             await self.text_handler(message, state)
         else:
             if cur_state == PersonalInfo.fio.state:

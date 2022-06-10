@@ -18,8 +18,6 @@ class Teacher:
         self.db = db
         self.buttons = buttons
         dp.register_message_handler(self.text_handler, state=MainStates.teacher)
-        # dp.register_callback_query_handler(self.inline_keyboard_handler,
-        #                                    state=[MainStates.teacher, Recording.edit_video, Recording.edit_description])
         dp.register_message_handler(self.send_recordings,
                                     state=[MainStates.teacher, Recording.video, Recording.description],
                                     content_types=ContentType.ANY)
@@ -79,35 +77,6 @@ class Teacher:
                 await message.answer(
                     "Данные успешно изменены!\n\nНажмите кнопку <b>Подтвердить</b> выше, если данные корректны 👆")
                 await MainStates.teacher.set()
-
-    # async def inline_keyboard_handler(self, callback: CallbackQuery, state: FSMContext):
-    #     data = callback.data.split("|")
-        # if data[0] == "Record":
-        #     if data[1] == "video":
-        #         await callback.message.answer(text="📨 Пришлите видеозапись последнего занятия")
-        #         await Recording.edit_video.set()
-        #     elif data[1] == "description":
-        #         await callback.message.answer(text="📝 Опишите кратно темы, которые были пройдены на этом занятии")
-        #         await Recording.edit_description.set()
-        #     elif data[1] == "accept":
-        #         data_state = await state.get_data()
-        #         await self.bot.delete_message(chat_id=callback.message.chat.id,
-        #                                       message_id=data_state['lesson_recording_message_id'])
-        #         await callback.message.answer("✅ Данные подтверждены успешно!")
-        #         lesson_number = self.db.save_new_recording(data_state['video_id'], data_state['description'], data_state['flow_id'])
-        #
-        #         locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')
-        #         for student_chat_id in self.db.get_students_chat_id_in_flow(data_state['flow_id']):
-        #             await self.bot.send_video(chat_id= student_chat_id,
-        #                                       video=data_state['video_id'],
-        #                                       caption=LESSON_RECORDING_FOR_STUDENT_TEXT.format(
-        #                                           datetime.now().strftime("%d %B"),
-        #                                           self.db.get_students_chat_id_in_flow(data_state['flow_id']),
-        #                                           lesson_number, data_state['description']))
-        # if data[0] == "Student":
-        #     chat_id = data[1]
-        #     fio, username, phone = self.db.get_student_info(chat_id)
-        #     await callback.message.answer(text=PERSON_INFO_TEXT.format("👨‍🎓", fio, username, phone))
 
     async def text_handler(self, message: Message, state: FSMContext):
         state_data = await state.get_data()

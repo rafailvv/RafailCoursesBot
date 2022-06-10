@@ -12,13 +12,13 @@ from bot.misc.states import PersonalInfo, MainStates, Recording
 
 
 class Callback:
-    def __init__(self, bot : Bot, db : Database, buttons : Buttons, dp : Dispatcher):
+    def __init__(self, bot: Bot, db: Database, buttons: Buttons, dp: Dispatcher):
         self.bot = bot
         self.db = db
         self.buttons = buttons
         dp.register_callback_query_handler(self.callback_handler, state="*")
 
-    async def callback_handler(self, callback : CallbackQuery, state : FSMContext):
+    async def callback_handler(self, callback: CallbackQuery, state: FSMContext):
         data = callback.data.split("|")
         state_data = await state.get_data()
         if data[0] == "Buy":
@@ -89,10 +89,11 @@ class Callback:
                 await self.bot.delete_message(chat_id=callback.message.chat.id,
                                               message_id=data_state['lesson_recording_message_id'])
                 await callback.message.answer("✅ Данные подтверждены успешно!")
-                lesson_number = self.db.save_new_recording(data_state['video_id'], data_state['description'], data_state['flow_id'])
+                lesson_number = self.db.save_new_recording(data_state['video_id'], data_state['description'],
+                                                           data_state['flow_id'])
 
                 for student_chat_id in self.db.get_students_chat_id_in_flow(data_state['flow_id']):
-                    await self.bot.send_video(chat_id= student_chat_id[0],
+                    await self.bot.send_video(chat_id=student_chat_id[0],
                                               video=data_state['video_id'],
                                               caption=LESSON_RECORDING_FOR_STUDENT_TEXT.format(
                                                   datetime.now().strftime("%d.%m"),
@@ -102,3 +103,13 @@ class Callback:
             chat_id = data[1]
             fio, username, phone = self.db.get_student_info(chat_id)
             await callback.message.answer(text=PERSON_INFO_TEXT.format("👨‍🎓", fio, username, phone))
+
+        elif data[0] == "RecLesson":
+            lesson_date, course_name, lesson_number, description, recording = self.db.get_recorded_lesson(int(data[1]))
+            lesson_date = f"{lesson_date.split('-')[2]}.{lesson_date.split('-')[1]}"
+            await self.bot.send_video(chat_id=callback.message.chat.id,
+                                      video=recording,
+                                      caption=LESSON_RECORDING_FOR_STUDENT_TEXT.format(lesson_date,
+                                                                                       course_name[2:],
+                                                                                       lesson_number,
+                                                                                       description))

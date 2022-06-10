@@ -42,8 +42,8 @@ class Student:
             await message.answer(text=CONNECT_TO_LINK_STUDENT,
                                  reply_markup=self.buttons.get_link_to_lesson(state_data['flow_id']))
         elif message.text == self.buttons.lesson_video_btn.text:
-            #TODO
-            pass
+            await message.answer(text="Выберите интересующее занятие 👇🏼",
+                                 reply_markup=self.buttons.get_recorded_lessons(state_data['flow_id']))
         elif message.text == self.buttons.send_homework_btn.text:
             #TODO
             pass

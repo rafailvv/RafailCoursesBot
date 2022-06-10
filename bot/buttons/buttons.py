@@ -119,3 +119,10 @@ class Buttons:
         buttons.insert(self.student_account_btn)
         return buttons
 
+    def get_recorded_lessons(self, flow_id):
+        buttons = InlineKeyboardMarkup(row_width=2)
+        for lesson_number, id in self.db.get_id_recordings_by_flow_id(flow_id):
+            buttons.insert(InlineKeyboardButton(text=f"Урок {lesson_number}", callback_data=f"RecLesson|{id}"))
+        return buttons
+
+

@@ -16,12 +16,6 @@ class Registration:
         self.bot = bot
         self.db = db
         self.buttons = buttons
-        # dp.register_callback_query_handler(self.persona_data_correcting,
-        #                                    state=[MainStates.registration,
-        #                                           PersonalInfo.check_info, PersonalInfo.username, PersonalInfo.phone,
-        #                                           PersonalInfo.fio, PersonalInfo.edit_fio, PersonalInfo.edit_phone, PersonalInfo.edit_username])
-        # dp.register_callback_query_handler(self.registration_confirmation,
-        #                                    state="*")
         dp.register_message_handler(self.text_handler, state=MainStates.registration)
         dp.register_message_handler(self.personal_info,
                                     state=[PersonalInfo.fio, PersonalInfo.phone, PersonalInfo.username])
@@ -29,63 +23,6 @@ class Registration:
                                     state=[PersonalInfo.edit_fio, PersonalInfo.edit_phone, PersonalInfo.edit_username])
         # dp.register_pre_checkout_query_handler(self.pre_checkout_handler, state=MainStates.registration)
         # dp.register_message_handler(self.after_payment, state=[registration], content_types=ContentTypes.SUCCESSFUL_PAYMENT)
-
-    # async def registration_confirmation(self,callback: CallbackQuery):
-    #     data = callback.data.split("|")
-    #     if data[0] == "Buy":
-    #         await self.bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)
-    #         if data[1] == "Reject":
-    #             await self.bot.send_message(chat_id=data[2],
-    #                                         text=REJECTED_TEXT.format(
-    #                                             self.db.get_course_name_by_course_id(data[3])[2:]))
-    #             self.db.update_confirmation(data[4])
-    #         if data[1] == "Accept":
-    #             if self.db.get_student_chat_id_by_id(data[4]) is not None:
-    #                 await self.bot.send_message(chat_id=data[2],
-    #                                             text=ACCEPTED_TEXT.format(
-    #                                                 self.db.get_course_name_by_course_id(data[3])[2:]),
-    #                                             reply_markup=self.buttons.get_button_to_student_page())
-    #             else:
-    #                 await self.bot.send_message(chat_id=data[2],
-    #                                             text=ACCEPTED_TEXT.format(
-    #                                                 self.db.get_course_name_by_course_id(data[3])[2:]))
-    #             self.db.update_confirmation(data[4], True)
-
-    # async def persona_data_correcting(self, callback: CallbackQuery, state: FSMContext):
-    #     data = callback.data.split("|")
-    #     state_data = await state.get_data()
-    #     if data[0] == "PersInfo":
-    #         if data[1] == "fio":
-    #             await callback.message.answer(text="🔡 Введите ФИО учащегося")
-    #             await PersonalInfo.edit_fio.set()
-    #         elif data[1] == "phone":
-    #             await callback.message.answer(text="📲 Введите номер телефона учащегося")
-    #             await PersonalInfo.edit_phone.set()
-    #         elif data[1] == "username":
-    #             await callback.message.answer(text="🔑 Введите ник (@....) учащегося",
-    #                                           reply_markup=self.buttons.how_find_username())
-    #             await PersonalInfo.edit_username.set()
-    #         elif data[1] == "accept":
-    #             await self.bot.delete_message(chat_id=callback.message.chat.id, message_id=state_data['corr_pi_msg'].message_id)
-    #             await callback.message.answer("✅ Данные подтверждены успешно!")
-    #
-    #             chat_id = None
-    #             if state_data['username'] == callback.message.chat.username:
-    #                 chat_id = callback.message.chat.id
-    #             self.db.add_student(state_data['fio'], state_data['phone'], state_data['username'],
-    #                                       self.db.get_near_course_flow_by_course_id(state_data['course_id']), chat_id)
-    #
-    #             await callback.message.answer(
-    #                 text=BUY_COURSE_TEXT.format(self.db.get_course_name_by_course_id(state_data['course_id'])[2:]))
-    #
-    #             await self.bot.send_message(chat_id=ID_RAFAIL,
-    #                                         text=INFO_FOR_BUY_COURSE.format(state_data['fio'],
-    #                                                                         state_data['username'],
-    #                                                                         self.db.get_course_name_by_course_id(state_data['course_id'])[2:]),
-    #                                         reply_markup=self.buttons.get_confirm_and_reject(callback.message.chat.id,
-    #                                                                                          state_data['course_id'],
-    #                                                                                       self.db.get_student_id_by_username(state_data['username'])))
-    #             await MainStates.registration.set()
 
     def get_ending_word_day(self, number: int):
         if 11 <= number <= 19 or number % 10 in [0, 5, 6, 7, 8, 9]:

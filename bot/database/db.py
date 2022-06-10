@@ -189,14 +189,27 @@ class Database:
                         WHERE course_flow.id = {flow_id} AND teacher.id = course_flow.teacher""").fetchone()
 
     def save_new_recording(self, video, description, flow_id):
-        lesson_number = self.cur.execute(f"SELECT MIN(lesson_number) FROM video_recordings WHERE flow_id = {flow_id}").fetchone()[0]
+        lesson_number = self.cur.execute(f"SELECT MIN(lesson_number) FROM video_recording WHERE flow_id = {flow_id}").fetchone()[0]
         if lesson_number is None:
             lesson_number = 1
+        else:
+            lesson_number += 1
 
-        self.cur.execute(f"""INSERT INTO video_recordings(flow_id, lesson_number, lesson_date, description, recording)
-                    VALUES({flow_id}, {lesson_number}, '{datetime.now()}', '{description}', '{video}')""")
+        self.cur.execute(f"""INSERT INTO video_recording(flow_id, lesson_number, lesson_date, description, recording)
+                    VALUES({flow_id}, {lesson_number}, '{datetime.now().date()}', '{description}', '{video}')""")
         self.db.commit()
         return lesson_number
 
     def get_students_chat_id_in_flow(self, flow_id):
         return self.cur.execute(f"SELECT chat_id FROM student WHERE course_flow = {flow_id}").fetchall()
+
+    def get_id_recordings_by_flow_id(self, flow_id):
+        return self.cur.execute(f"SELECT lesson_number, id  FROM video_recording WHERE flow_id = {flow_id} ORDER BY lesson_number").fetchall()
+
+    def get_recorded_lesson(self, id):
+        return self.cur.execute(f"""
+            SELECT vr.lesson_date, c.name, vr.lesson_number, vr.description, vr.recording 
+            FROM video_recording vr
+            INNER JOIN course_flow cf on vr.flow_id = cf.id
+            INNER JOIN course c on cf.course = c.id WHERE vr.id = {id}
+        """).fetchone()

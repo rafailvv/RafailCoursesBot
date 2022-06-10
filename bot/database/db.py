@@ -16,9 +16,15 @@ class Database:
     def get_course_program(self, course_id):
         return self.cur.execute(f"SELECT program FROM course WHERE id = '{course_id}'").fetchone()[0]
 
-    def get_course_name(self, course_id):
+    def get_course_name_by_course_id(self, course_id):
         return self.cur.execute(f"SELECT name FROM course WHERE id = '{course_id}'").fetchone()[0]
 
+    def get_course_name_by_flow_id(self, flow_id):
+        return self.cur.execute("""
+            SELECT c.name
+            FROM course c
+            INNER JOIN course_flow cf on c.id = cf.course
+        """).fetchone()[0]
     def get_course_full_description(self, course_id):
         des_query = self.cur.execute(
             f"SELECT short_description,description FROM course WHERE id = '{course_id}'").fetchone()
@@ -182,3 +188,15 @@ class Database:
         return self.cur.execute(f"""SELECT full_name, username, phone FROM course_flow, teacher 
                         WHERE course_flow.id = {flow_id} AND teacher.id = course_flow.teacher""").fetchone()
 
+    def save_new_recording(self, video, description, flow_id):
+        lesson_number = self.cur.execute(f"SELECT MIN(lesson_number) FROM video_recordings WHERE flow_id = {flow_id}").fetchone()[0]
+        if lesson_number is None:
+            lesson_number = 1
+
+        self.cur.execute(f"""INSERT INTO video_recordings(flow_id, lesson_number, lesson_date, description, recording)
+                    VALUES({flow_id}, {lesson_number}, '{datetime.now()}', '{description}', '{video}')""")
+        self.db.commit()
+        return lesson_number
+
+    def get_students_chat_id_in_flow(self, flow_id):
+        return self.cur.execute(f"SELECT chat_id FROM student WHERE course_flow = {flow_id}").fetchall()

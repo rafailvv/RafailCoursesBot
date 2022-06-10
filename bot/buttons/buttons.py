@@ -86,7 +86,7 @@ class Buttons:
     def get_students_names_in_flow(self, flow_id):
         buttons = InlineKeyboardMarkup(row_width=1)
         for name, chat_id in self.db.get_list_students_by_flow_id(flow_id):
-            buttons.insert(InlineKeyboardButton(text=name, callback_data=chat_id))
+            buttons.insert(InlineKeyboardButton(text=name, callback_data=f"Student|{chat_id}"))
         return buttons
 
     def get_link_to_lesson(self, flow_id):
@@ -105,6 +105,13 @@ class Buttons:
         buttons.insert(InlineKeyboardButton("✏ Изменить номер телефона", callback_data="PersInfo|phone"))
         buttons.insert(InlineKeyboardButton("✏ Изменить ник", callback_data="PersInfo|username"))
         buttons.insert(InlineKeyboardButton("✅ Подтвердить", callback_data="PersInfo|accept"))
+        return buttons
+
+    def edit_recording_info(self):
+        buttons = InlineKeyboardMarkup(row_width=1)
+        buttons.insert(InlineKeyboardButton("✏ Изменить видеозапись", callback_data="Record|video"))
+        buttons.insert(InlineKeyboardButton("✏ Изменить описание", callback_data="Record|description"))
+        buttons.insert(InlineKeyboardButton("✅ Подтвердить", callback_data="Record|accept"))
         return buttons
 
     def get_button_to_student_page(self):

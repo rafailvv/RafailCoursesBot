@@ -4,19 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8ee54b20-319a-4727-bcb2-c2e45757609a" name="Changes" comment="Draft with start student panel">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/5159b744-8c7e-4915-89ae-49bb5abbd913.xml" beforeDir="false" />
+    <list default="true" id="8ee54b20-319a-4727-bcb2-c2e45757609a" name="Changes" comment="Draft without video sending and homework checking">
+      <change afterPath="$PROJECT_DIR$/bot/handlers/callback.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot/buttons/buttons.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/buttons/buttons.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot/database/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/database/db.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot/database/education.db" beforeDir="false" afterPath="$PROJECT_DIR$/bot/database/education.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot/handlers/registration.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/handlers/registration.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bot/handlers/start.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/handlers/start.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bot/handlers/student.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/handlers/student.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot/handlers/teacher.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/handlers/teacher.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot/message_texts/constans.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/message_texts/constans.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot/misc/states.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/misc/states.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -207,10 +205,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.main" />
+        <item itemvalue="Python.db (1)" />
         <item itemvalue="Python.teacher" />
         <item itemvalue="Python.start" />
         <item itemvalue="Python.registration" />
-        <item itemvalue="Python.db (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -244,7 +242,8 @@
       <workItem from="1654772776804" duration="3118000" />
       <workItem from="1654787732780" duration="1836000" />
       <workItem from="1654797552838" duration="4160000" />
-      <workItem from="1654804261451" duration="705000" />
+      <workItem from="1654804261451" duration="1080000" />
+      <workItem from="1654840583327" duration="24004000" />
     </task>
     <task id="LOCAL-00001" summary="Draft without payment">
       <created>1654281465351</created>
@@ -274,7 +273,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654717279140</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Draft without video sending and homework checking">
+      <created>1654805312532</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1654805312532</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -297,14 +303,15 @@
     <MESSAGE value="Draft with teacher account" />
     <MESSAGE value="Draft with done registration" />
     <MESSAGE value="Draft with start student panel" />
-    <option name="LAST_COMMIT_MESSAGE" value="Draft with start student panel" />
+    <MESSAGE value="Draft without video sending and homework checking" />
+    <option name="LAST_COMMIT_MESSAGE" value="Draft without video sending and homework checking" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/bot/handlers/registration.py</url>
-          <line>85</line>
+          <line>90</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -314,27 +321,27 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/bot/database/db.py</url>
-          <line>37</line>
+          <line>43</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/bot/handlers/teacher.py</url>
-          <line>22</line>
-          <option name="timeStamp" value="12" />
+          <url>file://$PROJECT_DIR$/bot/database/db.py</url>
+          <line>192</line>
+          <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/bot/handlers/teacher.py</url>
-          <line>23</line>
-          <option name="timeStamp" value="13" />
+          <url>file://$PROJECT_DIR$/bot/handlers/registration.py</url>
+          <line>33</line>
+          <option name="timeStamp" value="15" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/RafailCoursesBot$database.coverage" NAME="database Coverage Results" MODIFIED="1654252169434" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/RafailCoursesBot$main.coverage" NAME="main Coverage Results" MODIFIED="1654804886104" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/RafailCoursesBot$db__1_.coverage" NAME="db (1) Coverage Results" MODIFIED="1654513381844" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bot/database" />
+    <SUITE FILE_PATH="coverage/RafailCoursesBot$main.coverage" NAME="main Coverage Results" MODIFIED="1654891728286" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/RafailCoursesBot$registration.coverage" NAME="registration Coverage Results" MODIFIED="1654515379392" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bot/handlers" />
+    <SUITE FILE_PATH="coverage/RafailCoursesBot$db__1_.coverage" NAME="db (1) Coverage Results" MODIFIED="1654886166250" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bot/database" />
     <SUITE FILE_PATH="coverage/RafailCoursesBot$start.coverage" NAME="start Coverage Results" MODIFIED="1654590400497" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bot/handlers" />
     <SUITE FILE_PATH="coverage/RafailCoursesBot$constans.coverage" NAME="constans Coverage Results" MODIFIED="1654246101783" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/RafailCoursesBot$config.coverage" NAME="config Coverage Results" MODIFIED="1654500936347" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bot" />

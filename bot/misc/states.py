@@ -17,3 +17,20 @@ class PersonalInfo(StatesGroup):
     edit_fio = State()
     edit_phone = State()
     edit_username = State()
+
+
+class Recording(StatesGroup):
+    description = State()
+    video = State()
+
+    edit_description = State()
+    edit_video = State()
+
+
+class SendAll(StatesGroup):
+    send = State()
+
+
+class HomeWork(StatesGroup):
+    assign = State()
+    for_confirmation = State()

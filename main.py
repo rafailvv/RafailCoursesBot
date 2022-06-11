@@ -1,15 +1,17 @@
 import asyncio
 import logging
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher,executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
 
 from bot.buttons.buttons import Buttons
 from bot.config import load_config
 from bot.database.db import Database
+from bot.handlers.callback import Callback
 from bot.handlers.registration import Registration
 from bot.handlers.start import Start
+from bot.handlers.student import Student
 from bot.handlers.teacher import Teacher
 
 logger = logging.getLogger(__name__)
@@ -32,9 +34,12 @@ async def main():
     db = Database()
     buttons = Buttons(db)
 
-    Start(bot, db, buttons, dp)
+    start = Start(bot, db, buttons, dp)
+    Callback(bot, db, buttons, dp)
     Registration(bot, db, buttons, dp)
     Teacher(bot, db, buttons, dp)
+    Student(bot, db, buttons, dp)
+
 
     try:
         await dp.start_polling()

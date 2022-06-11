@@ -25,3 +25,12 @@ class Recording(StatesGroup):
 
     edit_description = State()
     edit_video = State()
+
+
+class SendAll(StatesGroup):
+    send = State()
+
+
+class HomeWork(StatesGroup):
+    assign = State()
+    for_confirmation = State()

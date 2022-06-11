@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher,executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
 
@@ -34,7 +34,7 @@ async def main():
     db = Database()
     buttons = Buttons(db)
 
-    Start(bot, db, buttons, dp)
+    start = Start(bot, db, buttons, dp)
     Callback(bot, db, buttons, dp)
     Registration(bot, db, buttons, dp)
     Teacher(bot, db, buttons, dp)

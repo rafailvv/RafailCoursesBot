@@ -25,6 +25,7 @@ class Database:
             FROM course c
             INNER JOIN course_flow cf on c.id = cf.course
         """).fetchone()[0]
+
     def get_course_full_description(self, course_id):
         des_query = self.cur.execute(
             f"SELECT short_description,description FROM course WHERE id = '{course_id}'").fetchone()
@@ -129,13 +130,15 @@ class Database:
 
     def get_list_students_by_flow_id(self, id):
         return self.cur.execute(
-            f"SELECT full_name, chat_id FROM student WHERE course_flow = {id} AND is_approved = 1").fetchall()
+            f"SELECT full_name, id FROM student WHERE course_flow = {id} AND is_approved = 1").fetchall()
 
     def get_chat_id_students_in_flow(self, id):
         a = self.cur.execute(f"SELECT chat_id FROM student WHERE course_flow = {id} AND is_approved = 1").fetchall()
         return a
-    def get_student_info(self, chat_id):
-        return self.cur.execute(f"SELECT full_name, username, phone FROM student WHERE chat_id = {chat_id} AND is_approved = 1").fetchone()
+
+    def get_student_info(self, student_id):
+        return self.cur.execute(
+            f"SELECT full_name, username, phone FROM student WHERE id = {student_id} AND is_approved = 1").fetchone()
 
     def add_student(self, full_name, phone, username, course_flow, chat_id):
         if chat_id is None:
@@ -189,7 +192,8 @@ class Database:
                         WHERE course_flow.id = {flow_id} AND teacher.id = course_flow.teacher""").fetchone()
 
     def save_new_recording(self, video, description, flow_id):
-        lesson_number = self.cur.execute(f"SELECT MIN(lesson_number) FROM video_recording WHERE flow_id = {flow_id}").fetchone()[0]
+        lesson_number = \
+        self.cur.execute(f"SELECT MIN(lesson_number) FROM video_recording WHERE flow_id = {flow_id}").fetchone()[0]
         if lesson_number is None:
             lesson_number = 1
         else:
@@ -204,7 +208,8 @@ class Database:
         return self.cur.execute(f"SELECT chat_id FROM student WHERE course_flow = {flow_id}").fetchall()
 
     def get_id_recordings_by_flow_id(self, flow_id):
-        return self.cur.execute(f"SELECT lesson_number, id  FROM video_recording WHERE flow_id = {flow_id} ORDER BY lesson_number").fetchall()
+        return self.cur.execute(
+            f"SELECT lesson_number, id  FROM video_recording WHERE flow_id = {flow_id} ORDER BY lesson_number").fetchall()
 
     def get_recorded_lesson(self, id):
         return self.cur.execute(f"""
@@ -213,3 +218,107 @@ class Database:
             INNER JOIN course_flow cf on vr.flow_id = cf.id
             INNER JOIN course c on cf.course = c.id WHERE vr.id = {id}
         """).fetchone()
+
+    def get_past_lessons_numbers(self, flow_id):
+        return self.cur.execute(f"""SELECT lesson_number FROM video_recording WHERE flow_id = {flow_id}""").fetchall()
+
+    def get_fio_teacher_by_chat_id(self, chat_id):
+        return " ".join(
+            self.cur.execute(f"""SELECT full_name FROM teacher WHERE chat_id = {chat_id}""").fetchone()[0].split()[1:])
+
+    def add_hw(self, flow_id, lesson_number, student_id, content, content_type):
+        self.cur.execute(f"""INSERT INTO homework (flow_id, lesson_number, student_id, datatime_added, content_type, content) 
+            VALUES ({flow_id}, {int(lesson_number)}, {student_id}, '{datetime.now()}', '{content_type}','{content}')""")
+        self.db.commit()
+
+        return self.cur.execute(f"""
+            SELECT id FROM homework WHERE flow_id = {flow_id} AND lesson_number = {lesson_number} AND student_id = {student_id}
+            AND content_type = '{content_type}' AND content = '{content}'
+        """).fetchone()[0]
+
+    # def get_hw_id(self, flow_id, lesson_number, student_id):
+    #     return self.cur.execute(f"SELECT id FROM homework WHERE flow_id = {flow_id} AND lesson_number = '{lesson_number}' AND "
+    #                             f"student_id = {student_id} AND confirmation = 0").fetchone()[0]
+
+    def get_hw(self, id):
+        return self.cur.execute(f"SELECT content, content_type FROM homework WHERE id = {id}").fetchone()
+
+    def get_hw_solution(self, id):
+        return self.cur.execute(f"SELECT content_solution, content_type_solution FROM homework WHERE id = {id}").fetchone()
+
+    def update_hw_solution(self, id, content, content_type):
+        self.cur.execute(f"UPDATE homework SET content_solution = '{content}', content_type_solution = '{content_type}', "
+                         f"confirmation = 0 WHERE id = {id}")
+        self.db.commit()
+
+    def get_teacher_chat_id_by_hw_id(self, hw_id):
+        return self.cur.execute(f"""
+            SELECT t.chat_id
+            FROM teacher t
+            INNER JOIN course_flow cf on t.id = cf.teacher
+            INNER JOIN homework h on cf.id = h.flow_id AND h.id = {hw_id}
+        """).fetchone()[0]
+
+    def get_student_chat_id_by_hw_id(self, hw_id):
+        return self.cur.execute(f"""
+            SELECT s.chat_id
+            FROM student s
+            INNER JOIN homework h on s.id = h.student_id AND h.id = {hw_id}
+        """).fetchone()[0]
+
+    def get_student_fio_by_hw_id(self, hw_id):
+        return self.cur.execute(f"""
+            SELECT s.full_name
+            FROM student s
+            INNER JOIN homework h on s.id = h.student_id AND h.id = {hw_id}
+        """).fetchone()[0]
+
+    def get_teacher_fio_by_hw_id(self, hw_id):
+        return  " ".join(self.cur.execute(f"""
+            SELECT t.full_name
+            FROM teacher t 
+            INNER JOIN course_flow cf on t.id = cf.teacher
+            INNER JOIN homework h on cf.id = h.flow_id AND h.id = {hw_id}
+        """).fetchone()[0].split()[1:])
+
+    def get_lesson_number_by_hw_id(self, hw_id):
+        return self.cur.execute(f"SELECT lesson_number FROM homework WHERE id = {hw_id}").fetchone()[0]
+
+    def get_not_done_hw_id(slef, flow_id,student_chat_id):
+        return slef.cur.execute(f"""
+            SELECT h.id, h.lesson_number 
+            FROM homework h
+            INNER JOIN student s on h.student_id = s.id 
+            AND h.flow_id = {flow_id} AND s.chat_id = {student_chat_id} 
+            AND content_solution is null OR confirmation = -1""").fetchall()
+
+    def get_unchecked_lessons(self, flow_id):
+        list_lessons = self.cur.execute(f"""
+            SELECT lesson_number FROM homework WHERE content_solution is not null 
+            AND confirmation = 0 AND flow_id = {flow_id}
+        """).fetchall()
+
+        for i in range(len(list_lessons)):
+            list_lessons[i] = int(list_lessons[i][0])
+        list_lessons.sort()
+
+        return list(set(list_lessons))
+
+    def get_names_for_unchecked_hw(self, flow_id, lesson_number):
+        return self.cur.execute(f"""
+            SELECT s.full_name, h.id
+            FROM homework h 
+            INNER JOIN student s on h.student_id = s.id
+            AND  h.content_solution is not null
+            AND  (h.confirmation = 0 OR h.content_solution = -1) 
+            AND  h.flow_id = {flow_id} AND  h.lesson_number = {lesson_number}
+        """).fetchall()
+
+    def accept_homework(self, hw_id):
+        self.cur.execute(f"UPDATE homework SET confirmation = 1 WHERE id = {hw_id}")
+        self.db.commit()
+
+    def reject_homework(self, hw_id):
+        self.cur.execute(f"UPDATE homework SET confirmation = -1, content_solution = null, content_type_solution = null"
+                         f" WHERE id = {hw_id}")
+        self.db.commit()

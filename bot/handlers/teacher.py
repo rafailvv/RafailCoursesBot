@@ -9,7 +9,7 @@ from bot.buttons.buttons import Buttons
 from bot.database.db import Database
 from bot.message_texts.constans import SELECTED_FLOW_TEXT, CONNECT_TO_LINK_TEACHER, FLOW_LIST_TEXT, \
     NOTIFICATION_STUDENT_START_LESSON_TEXT, PERSON_INFO_TEXT, LESSON_RECORDING_FOR_STUDENT_TEXT
-from bot.misc.states import MainStates, Recording
+from bot.misc.states import MainStates, Recording, SendAll, HomeWork
 
 
 class Teacher:
@@ -24,6 +24,12 @@ class Teacher:
         dp.register_message_handler(self.edit_send_recordings,
                                     state=[MainStates.teacher, Recording.edit_video, Recording.edit_description],
                                     content_types=ContentType.ANY)
+        dp.register_message_handler(self.send_all_student,
+                                    state=SendAll.send,
+                                    content_types=ContentType.ANY)
+        dp.register_message_handler(self.assign_homework,
+                                    state = HomeWork.assign,
+                                    content_types=ContentType.ANY)
 
     async def send_recordings(self, message: Message, state: FSMContext):
         if message.text in [self.buttons.lesson_link_btn.text, self.buttons.lesson_video_btn.text,
@@ -34,9 +40,12 @@ class Teacher:
         else:
             cur_state = await state.get_state()
             if cur_state == Recording.video.state:
-                await state.update_data(video_id=message.video.file_id)
-                await message.answer(text="📝 Опишите кратно темы, которые были изучены на этом занятии")
-                await Recording.description.set()
+                if message.content_type == "video":
+                    await state.update_data(video_id=message.video.file_id)
+                    await message.answer(text="📝 Кратко опишите темы, которые были изучены на этом занятии")
+                    await Recording.description.set()
+                else:
+                    await message.answer("❗Отправьте видеозапись занятия в <b>формате видео</b>❗")
             elif cur_state == Recording.description.state:
                 await state.update_data(description="📝 На данном занятии были пройдены такие темы, как " +
                                                     message.text[0].lower() + message.text[1:])
@@ -101,13 +110,92 @@ class Teacher:
                                      self.db.get_teacher_id_by_chat_id(message.chat.id)))
 
         elif message.text == self.buttons.student_list_btn.text:
-            await message.answer(text="Список учащихся 👇🏼",
-                                 reply_markup=self.buttons.get_students_names_in_flow(state_data['flow_id']))
+            await message.answer(text="👇 Список учащихся 👇",
+                                 reply_markup=self.buttons.get_students_list_in_flow(state_data['flow_id']))
         elif message.text == self.buttons.lesson_video_btn.text:
             await message.answer(text="📨 Пришлите видеозапись последнего занятия")
             await Recording.video.set()
         elif message.text == self.buttons.check_homework_btn.text:
-            # TODO
-            pass
+            await message.answer(text="👇 Выберите действие 👇",
+                                 reply_markup=self.buttons.home_action_selection())
         else:
             await message.answer("К сожалению, я Вас не понимаю 😢")
+
+    async def send_all_student(self, message: Message, state: FSMContext):
+        if message.text in [self.buttons.lesson_link_btn.text, self.buttons.lesson_video_btn.text,
+                            self.buttons.student_list_btn.text, self.buttons.check_homework_btn.text,
+                            self.buttons.back_to_courses_btn.text]:
+            await self.text_handler(message, state)
+            await MainStates.teacher.set()
+        else:
+            is_possible = True
+            if message.content_type == "text":
+                await message.answer(text=message.text, reply_markup=self.buttons.edit_message("SendAll"))
+            elif message.content_type == "document":
+                await message.answer_document(document=message.document.file_id,
+                                              reply_markup=self.buttons.edit_message("SendAll"))
+            elif message.content_type == "photo":
+                await message.answer_photo(photo=message.photo[-1].file_id, caption=message.caption,
+                                           reply_markup=self.buttons.edit_message("SendAll"))
+            elif message.content_type == "video":
+                await message.answer_video(video=message.video.file_id, caption=message.caption,
+                                           reply_markup=self.buttons.edit_message("SendAll"))
+            elif message.content_type == "voice":
+                await message.answer_voice(voice=message.voice.file_id,
+                                           reply_markup=self.buttons.edit_message("SendAll"))
+            elif message.content_type == "video_note":
+                await message.answer_video_note(video_note=message.video_note.file_id,
+                                                reply_markup=self.buttons.edit_message("SendAll"))
+            else:
+                is_possible = False
+                await message.answer("К сожалению, данный тип сообщения не поддерживается 😢")
+            if is_possible:
+                hint = await message.answer("<b>Измените</b> или <b>Подтвердите</b> содержимое сообщения для отправки 👆")
+                await state.update_data(hint_msg_id=hint.message_id)
+                await MainStates.teacher.set()
+
+    async def assign_homework(self, message : Message, state : FSMContext):
+        if message.text in [self.buttons.lesson_link_btn.text, self.buttons.lesson_video_btn.text,
+                            self.buttons.student_list_btn.text, self.buttons.check_homework_btn.text,
+                            self.buttons.back_to_courses_btn.text]:
+            await self.text_handler(message, state)
+            await MainStates.teacher.set()
+        else:
+            is_possible = True
+            await state.update_data(content_type=message.content_type)
+            if message.content_type == "text":
+                await message.answer(text=message.text, reply_markup=self.buttons.edit_message("HW_T"))
+                await state.update_data(content =message.text )
+            elif message.content_type == "document":
+                await message.answer_document(document=message.document.file_id,
+                                              reply_markup=self.buttons.edit_message("HW_T"))
+                await state.update_data(content=message.document.file_id)
+            elif message.content_type == "photo":
+                await message.answer_photo(photo=message.photo[-1].file_id, caption=message.caption,
+                                           reply_markup=self.buttons.edit_message("HW_T"))
+                if message.caption is None:
+                    await state.update_data(content=message.photo[-1].file_id)
+                else:
+                    await state.update_data(content=message.photo[-1].file_id + "|" + message.caption)
+            elif message.content_type == "video":
+                await message.answer_video(video=message.video.file_id, caption=message.caption,
+                                           reply_markup=self.buttons.edit_message("HW_T"))
+                if message.caption is None:
+                    await state.update_data(content=message.video.file_id )
+                else:
+                    await state.update_data(content=message.video.file_id + "|" + message.caption)
+            elif message.content_type == "voice":
+                await message.answer_voice(voice=message.voice.file_id,
+                                           reply_markup=self.buttons.edit_message("HW_T"))
+                await state.update_data(content=message.voice.file_id)
+            elif message.content_type == "video_note":
+                await message.answer_video_note(video_note=message.video_note.file_id,
+                                                reply_markup=self.buttons.edit_message("HW_T"))
+                await state.update_data(content=message.video_note.file_id)
+            else:
+                is_possible = False
+                await message.answer("К сожалению, данный тип сообщения не поддерживается 😢")
+            if is_possible:
+                hint = await message.answer("<b>Измените</b> или <b>Подтвердите</b> содержимое сообщения для отправки 👆")
+                await state.update_data(hint_msg_id = hint.message_id)
+                await MainStates.teacher.set()

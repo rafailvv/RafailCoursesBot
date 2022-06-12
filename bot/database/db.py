@@ -285,12 +285,12 @@ class Database:
         return self.cur.execute(f"SELECT lesson_number FROM homework WHERE id = {hw_id}").fetchone()[0]
 
     def get_not_done_hw_id(slef, flow_id,student_chat_id):
-        return slef.cur.execute(f"""
+        return list(set (slef.cur.execute(f"""
             SELECT h.id, h.lesson_number 
             FROM homework h
             INNER JOIN student s on h.student_id = s.id 
             AND h.flow_id = {flow_id} AND s.chat_id = {student_chat_id} 
-            AND content_solution is null OR confirmation = -1""").fetchall()
+            AND content_solution is null OR confirmation = -1""").fetchall()))
 
     def get_unchecked_lessons(self, flow_id):
         list_lessons = self.cur.execute(f"""

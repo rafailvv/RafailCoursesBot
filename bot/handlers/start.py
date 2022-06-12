@@ -1,10 +1,11 @@
 from aiogram import Dispatcher, Bot
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message
+from aiogram.utils.exceptions import ChatNotFound
 
 from bot.buttons.buttons import Buttons
 from bot.database.db import Database
-from bot.message_texts.constans import TEACHER_START_TEXT, START_TEXT, STUDENT_START_TEXT
+from bot.message_texts.constans import TEACHER_START_TEXT, START_TEXT, STUDENT_START_TEXT, NEW_UPDATE_TEXT
 from bot.misc.states import MainStates
 
 
@@ -13,9 +14,23 @@ class Start:
         self.bot = bot
         self.db = db
         self.buttons = buttons
+
+
         dp.register_message_handler(self.start_message, commands=['start'], state="*")
 
+    async def send_upsated_bot_message(self):
+        for user_chat_id in self.db.get_chat_id_all_users():
+            user_chat_id = user_chat_id[0]
+            try:
+                 await self.bot.send_message(
+                    chat_id=user_chat_id,
+                    text=NEW_UPDATE_TEXT
+                )
+            except Exception:
+                self.db.delete_user(user_chat_id)
+
     async def start_message(self, message : Message,state : FSMContext):
+        self.db.add_user_if_not_exits(message.chat.id, message.from_user.username)
         if self.db.is_teacher(message.chat.id,message.from_user.username):
             flows = self.buttons.get_flow_for_teacher(self.db.get_teacher_id_by_chat_id(message.chat.id))
             if flows['keyboard']:

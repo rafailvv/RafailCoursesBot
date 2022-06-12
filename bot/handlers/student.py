@@ -5,7 +5,7 @@ from aiogram.types import Message, ContentType
 from bot.buttons.buttons import Buttons
 from bot.database.db import Database
 from bot.message_texts.constans import STUDENT_START_TEXT, SELECTED_FLOW_TEXT, FLOW_LIST_TEXT, TIMETABLE_TEXT, \
-    COURSES_LIST, PERSON_INFO_TEXT, CONNECT_TO_LINK_STUDENT
+    COURSES_LIST, PERSON_INFO_TEXT, CONNECT_TO_LINK_STUDENT, FEEDBACK_TEXT
 from bot.misc.states import MainStates, HomeWork
 
 
@@ -61,6 +61,8 @@ class Student:
                 )
             else:
                 await message.answer(text="🥳 Нет невыполненных домашних работ ")
+        elif message.text == self.buttons.feedback_btn.text:
+            await message.answer(text=FEEDBACK_TEXT)
         else:
             await message.answer("К сожалению, я тебя не понимаю 😢")
 

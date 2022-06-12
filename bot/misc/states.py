@@ -34,3 +34,5 @@ class SendAll(StatesGroup):
 class HomeWork(StatesGroup):
     assign = State()
     for_confirmation = State()
+
+    comment = State()

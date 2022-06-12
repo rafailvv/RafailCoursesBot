@@ -346,12 +346,21 @@ class Callback:
                     self.db.reject_homework(hw_id)
 
                     await self.bot.send_message(
-                        chat_id=self.db.get_student_chat_id_by_hw_id(hw_id),
-                        text=REJECTED_HW_TEXT.format(
-                            self.db.get_teacher_fio_by_hw_id(hw_id),
-                            self.db.get_lesson_number_by_hw_id(hw_id)
-                        )
+                        chat_id=callback.message.chat.id,
+                        text="🤓 Отавьте комментарий ученику"
                     )
+
+                    await HomeWork.comment.set()
+                    await state.update_data(hw_id = hw_id)
+                    # await self.bot.send_message(
+                    #     chat_id=self.db.get_student_chat_id_by_hw_id(hw_id),
+                    #     text=REJECTED_HW_TEXT.format(
+                    #         self.db.get_teacher_fio_by_hw_id(hw_id),
+                    #         self.db.get_lesson_number_by_hw_id(hw_id)
+                    #     )
+                    # )
+
+
 
 
         elif data[0] == "HW_S":

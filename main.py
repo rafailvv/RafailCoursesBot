@@ -40,6 +40,7 @@ async def main():
     Teacher(bot, db, buttons, dp)
     Student(bot, db, buttons, dp)
 
+    await start.send_upsated_bot_message()
 
     try:
         await dp.start_polling()

@@ -8,7 +8,7 @@ from aiogram.types import Message, CallbackQuery, ContentType, InputMediaVideo
 from bot.buttons.buttons import Buttons
 from bot.database.db import Database
 from bot.message_texts.constans import SELECTED_FLOW_TEXT, CONNECT_TO_LINK_TEACHER, FLOW_LIST_TEXT, \
-    NOTIFICATION_STUDENT_START_LESSON_TEXT, PERSON_INFO_TEXT, LESSON_RECORDING_FOR_STUDENT_TEXT
+    NOTIFICATION_STUDENT_START_LESSON_TEXT, PERSON_INFO_TEXT, LESSON_RECORDING_FOR_STUDENT_TEXT, REJECTED_HW_TEXT
 from bot.misc.states import MainStates, Recording, SendAll, HomeWork
 
 
@@ -29,6 +29,9 @@ class Teacher:
                                     content_types=ContentType.ANY)
         dp.register_message_handler(self.assign_homework,
                                     state = HomeWork.assign,
+                                    content_types=ContentType.ANY)
+        dp.register_message_handler(self.take_comment,
+                                    state=HomeWork.comment,
                                     content_types=ContentType.ANY)
 
     async def send_recordings(self, message: Message, state: FSMContext):
@@ -199,3 +202,19 @@ class Teacher:
                 hint = await message.answer("<b>Измените</b> или <b>Подтвердите</b> содержимое сообщения для отправки 👆")
                 await state.update_data(hint_msg_id = hint.message_id)
                 await MainStates.teacher.set()
+
+    async def take_comment(self, message : Message, state : FSMContext):
+        # TODO any types
+        data = await state.get_data()
+        hw_id = data['hw_id']
+
+        await self.bot.send_message(
+            chat_id=self.db.get_student_chat_id_by_hw_id(hw_id),
+            text=REJECTED_HW_TEXT.format(
+                self.db.get_teacher_fio_by_hw_id(hw_id),
+                self.db.get_lesson_number_by_hw_id(hw_id),
+                message.text[0].lower() + message.text[1:]
+            )
+        )
+
+        await message.answer(text="✅ Комментарий успешно отправлен")

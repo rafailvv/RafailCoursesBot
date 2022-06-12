@@ -19,6 +19,7 @@ class Buttons:
 
     student_account_btn = KeyboardButton(text="👨‍🎓 Перейти в кабинет студента")
     send_homework_btn = KeyboardButton(text="📩 Домашние задания")
+    feedback_btn = KeyboardButton(text = "📢 Обратная связь")
 
     def __init__(self, db):
         self.db = db
@@ -83,7 +84,8 @@ class Buttons:
         buttons.insert(self.lesson_video_btn)
         buttons.insert(self.teacher_info_btn)
         buttons.insert(self.send_homework_btn)
-        buttons.add(self.back_to_flow_btn)
+        buttons.insert(self.back_to_flow_btn)
+        buttons.insert(self.feedback_btn)
         return buttons
 
     def get_students_names_in_flow(self, flow_id, topic):
@@ -198,7 +200,7 @@ class Buttons:
         return buttons
 
     def get_names_unchecked_lessons(self, flow_id, lesson_number):
-        buttons = InlineKeyboardMarkup(row_width=2)
+        buttons = InlineKeyboardMarkup(row_width=1)
         for name, hw_id in self.db.get_names_for_unchecked_hw(flow_id,lesson_number):
             buttons.insert(InlineKeyboardButton(text=f"{name}", callback_data=f"HW_T|solution|{hw_id}"))
         return buttons

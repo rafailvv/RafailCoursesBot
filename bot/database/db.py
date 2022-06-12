@@ -284,13 +284,13 @@ class Database:
     def get_lesson_number_by_hw_id(self, hw_id):
         return self.cur.execute(f"SELECT lesson_number FROM homework WHERE id = {hw_id}").fetchone()[0]
 
-    def get_not_done_hw_id(slef, flow_id,student_chat_id):
+    def get_not_done_hw_id(slef, flow_id, student_chat_id):
         return list(set (slef.cur.execute(f"""
             SELECT h.id, h.lesson_number 
             FROM homework h
             INNER JOIN student s on h.student_id = s.id 
             AND h.flow_id = {flow_id} AND s.chat_id = {student_chat_id} 
-            AND content_solution is null OR confirmation = -1""").fetchall()))
+            AND content_solution is null""").fetchall()))
 
     def get_unchecked_lessons(self, flow_id):
         list_lessons = self.cur.execute(f"""
@@ -322,3 +322,15 @@ class Database:
         self.cur.execute(f"UPDATE homework SET confirmation = -1, content_solution = null, content_type_solution = null"
                          f" WHERE id = {hw_id}")
         self.db.commit()
+
+    def add_user_if_not_exits(self, chat_id, username):
+        if self.cur.execute(f"SELECT id FROM all_users WHERE chat_id = {chat_id}").fetchone() is None:
+            self.cur.execute(f"INSERT INTO all_users(chat_id, username) VALUES ({chat_id}, '@{username}')")
+            self.db.commit()
+
+    def delete_user(self, chat_id):
+        self.cur.execute(f"DELETE FROM all_users WHERE chat_id = {chat_id}")
+        self.db.commit()
+
+    def get_chat_id_all_users(self):
+        return self.cur.execute("SELECT chat_id FROM all_users").fetchall()

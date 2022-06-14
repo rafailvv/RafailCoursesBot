@@ -22,7 +22,7 @@ class Registration:
         dp.register_message_handler(self.editing_personal_info,
                                     state=[PersonalInfo.edit_fio, PersonalInfo.edit_phone, PersonalInfo.edit_username])
         # dp.register_pre_checkout_query_handler(self.pre_checkout_handler, state=MainStates.registration)
-        # dp.register_message_handler(self.after_payment, state=[registration], content_types=ContentTypes.SUCCESSFUL_PAYMENT)
+        # dp.register_message_handler(self.after_payment, state=[MainStates.registration], content_types=ContentTypes.SUCCESSFUL_PAYMENT)
 
     def get_ending_word_day(self, number: int):
         if 11 <= number <= 19 or number % 10 in [0, 5, 6, 7, 8, 9]:
@@ -45,11 +45,6 @@ class Registration:
             await self.bot.send_photo(chat_id=message.chat.id,
                                       photo=self.db.get_course_program(current_data['course_id']))
         elif message.text == self.buttons.buy_btn.text:
-
-            await message.answer(text="❗Для оформления заявки заполните пресональные данные учащегося 👇")
-            await message.answer(text="🔡 Введите ФИО учащегося")
-            await PersonalInfo.fio.set()
-
             # await self.bot.send_invoice(chat_id=message.chat.id,
             #                        title=self.db.get_course_name(current_data['course_id']),
             #                        description=self.db.get_course_short_description(current_data['course_id']),
@@ -59,6 +54,11 @@ class Registration:
             #                        start_parameter="course-payment",
             #                        prices=[LabeledPrice(label="Руб", amount=999 * 100)],
             #                        )
+            await message.answer(text="❗Для оформления заявки заполните пресональные данные учащегося 👇")
+            await message.answer(text="🔡 Введите ФИО учащегося")
+            await PersonalInfo.fio.set()
+
+
         elif message.text == self.buttons.back_to_courses_btn.text:
             await message.answer(text=COURSES_LIST,
                                  reply_markup=self.buttons.get_courses_buttons(self.db.check_if_is_student(message.chat.id)))
@@ -132,7 +132,7 @@ class Registration:
 
     # async def pre_checkout_handler(self, pre_checkout: PreCheckoutQuery):
     #     await self.bot.answer_pre_checkout_query(pre_checkout_query_id=pre_checkout.id, ok=True)
-
+    #
     # async def after_payment(self, message: Message, state: FSMContext):
     #     payload_info = message.successful_payment.invoice_payload.split("|")
     #     if payload_info[0] == 'Course':

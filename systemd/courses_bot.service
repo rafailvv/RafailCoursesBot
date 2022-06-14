@@ -1,0 +1,8 @@
+[Service]
+User=root
+WorkingDirectory=/home/RafailCoursesBot
+ExecStart=usr/bin/pythone3 main.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

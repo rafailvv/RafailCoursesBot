@@ -218,3 +218,4 @@ class Teacher:
         )
 
         await message.answer(text="✅ Комментарий успешно отправлен")
+        await MainStates.teacher.set()

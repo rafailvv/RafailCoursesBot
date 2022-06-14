@@ -438,10 +438,11 @@ class Callback:
                     message_id=callback.message.message_id,
                 )
 
-                await self.bot.delete_message(
-                    chat_id=callback.message.chat.id,
-                    message_id=state_data['hint_msg_id']
-                )
+                if 'hint_msg_id' in state_data.keys():
+                    await self.bot.delete_message(
+                        chat_id=callback.message.chat.id,
+                        message_id=state_data['hint_msg_id']
+                    )
 
                 self.db.update_hw_solution(
                     id=state_data['hw_id'],

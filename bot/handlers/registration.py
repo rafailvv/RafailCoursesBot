@@ -1,12 +1,10 @@
 from aiogram import Dispatcher, Bot
 from aiogram.dispatcher import FSMContext
-from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery, ContentTypes
+from aiogram.types import Message
 
+from phonenumbers import parse, is_valid_number
 from bot.buttons.buttons import Buttons
-from bot.message_texts.constans import START_TEXT, COURSE_TEXT, COURSES_LIST, BUY_COURSE_TEXT, ID_RAFAIL, \
-    INFO_FOR_BUY_COURSE, \
-    REJECTED_TEXT, ACCEPTED_TEXT, SUCCESSFUL_PAYMENT_TEXT, SUCCESSFUL_PAYMENT_INFO_FOR_ADMIN, TEACHER_START_TEXT, \
-    CORRECTNESS_PERSONAL_INFO, STUDENT_START_TEXT
+from bot.message_texts.constans import COURSE_TEXT, COURSES_LIST, CORRECTNESS_PERSONAL_INFO, STUDENT_START_TEXT
 from bot.database.db import Database
 from bot.misc.states import MainStates, PersonalInfo
 
@@ -87,10 +85,14 @@ class Registration:
                 else:
                     await message.answer(text="❗Введите Фамилию Имя и Отчество (отчество необязательно)❗")
             elif cur_state == PersonalInfo.phone.state:
-                await state.update_data(phone=message.text)
-                await message.answer(text="🔑 Введите ник учащегося (без знака @)",
-                                     reply_markup=self.buttons.how_find_username())
-                await PersonalInfo.username.set()
+                phone = parse(message.text, 'RU')
+                if is_valid_number(phone):
+                    await state.update_data(phone=message.text)
+                    await message.answer(text="🔑 Введите ник учащегося (без знака @)",
+                                         reply_markup=self.buttons.how_find_username())
+                    await PersonalInfo.username.set()
+                else:
+                    await message.answer(text="❗Некорректный номер телефона, попробуйте снова❗")
             elif cur_state == PersonalInfo.username.state:
                 if '@' in message.text:
                     await message.answer(text="❗Без знака @❗")
@@ -114,7 +116,11 @@ class Registration:
                 else:
                     await message.answer(text="❗Введите Фамилию Имя и Отчество (отчество необязательно)❗")
             elif cur_state == PersonalInfo.edit_phone.state:
-                await state.update_data(phone=message.text)
+                phone = parse(message.text, 'RU')
+                if is_valid_number(phone):
+                    await state.update_data(phone=message.text)
+                else:
+                    await message.answer(text="❗Некорректный номер телефона, попробуйте снова❗")
             elif cur_state == PersonalInfo.edit_username.state:
                 if '@' in message.text:
                     await message.answer(text="❗Без знака @❗")

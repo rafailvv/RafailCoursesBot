@@ -7,8 +7,7 @@ from aiogram.types import CallbackQuery
 from bot.buttons.buttons import Buttons
 from bot.database.db import Database
 from bot.message_texts.constans import REJECTED_TEXT, ACCEPTED_TEXT, BUY_COURSE_TEXT, INFO_FOR_BUY_COURSE, ID_RAFAIL, \
-    PERSON_INFO_TEXT, LESSON_RECORDING_FOR_STUDENT_TEXT, NEW_HW_TEXT, NEW_MSG_TEXT, SOLUTION_HW_TEXT, ACCEPTED_HW_TEXT, \
-    REJECTED_HW_TEXT
+    PERSON_INFO_TEXT, LESSON_RECORDING_FOR_STUDENT_TEXT, NEW_HW_TEXT, NEW_MSG_TEXT, SOLUTION_HW_TEXT, ACCEPTED_HW_TEXT
 from bot.misc.states import PersonalInfo, MainStates, Recording, SendAll, HomeWork
 
 
@@ -66,16 +65,18 @@ class Callback:
                 await callback.message.answer(
                     text=BUY_COURSE_TEXT.format(self.db.get_course_name_by_course_id(state_data['course_id'])[2:]))
 
-                await self.bot.send_message(chat_id=ID_RAFAIL,
-                                            text=INFO_FOR_BUY_COURSE.format(state_data['fio'],
-                                                                            state_data['username'],
-                                                                            self.db.get_course_name_by_course_id(
-                                                                                state_data['course_id'])[2:]),
-                                            reply_markup=self.buttons.get_confirm_and_reject(callback.message.chat.id,
-                                                                                             state_data['course_id'],
-                                                                                             self.db.get_student_id_by_username(
-                                                                                                 state_data[
-                                                                                                     'username'])))
+                await self.bot.send_message(
+                    chat_id=ID_RAFAIL,
+                    text=INFO_FOR_BUY_COURSE.format(
+                        callback.message.chat.username,
+                        self.db.get_course_name_by_course_id(state_data['course_id'])[2:],
+                        state_data['fio'],
+                        state_data['phone'],
+                        state_data['username']
+                    ),
+                    reply_markup=self.buttons.get_confirm_and_reject(
+                        callback.message.chat.id, state_data['course_id'],
+                        self.db.get_student_id_by_username(state_data['username'])))
                 await MainStates.registration.set()
 
         elif data[0] == "Record":
@@ -106,6 +107,12 @@ class Callback:
             await callback.message.answer(text=PERSON_INFO_TEXT.format("👨‍🎓", fio, username, phone))
 
         elif data[0] == "SendAll":
+
+            await self.bot.delete_message(
+                chat_id=callback.message.chat.id,
+                message_id=callback.message.message_id,
+            )
+
             if data[1] == "send":
                 await self.bot.send_message(chat_id=callback.message.chat.id,
                                             text="🙏 Пришлите содержимое сообщения")
@@ -116,10 +123,6 @@ class Callback:
                 await SendAll.send.set()
             elif data[1] == "accept":
                 data_state = await state.get_data()
-                await self.bot.delete_message(
-                    chat_id=callback.message.chat.id,
-                    message_id=callback.message.message_id,
-                )
 
                 await self.bot.delete_message(
                     chat_id=callback.message.chat.id,

@@ -1,6 +1,6 @@
 # Rafail Courses Bot
 
-Learning management system adapted for telegram bot, which is used to moderate your own courses
+Learning management system adapted for telegram bot, which is used to moderate my own courses
 
 **Link to bot:** https://t.me/innoprog_bot
 

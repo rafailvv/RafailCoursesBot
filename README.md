@@ -2,6 +2,8 @@
 
 Learning management system adapted for telegram bot, which is used to moderate your own courses
 
+Link to bot: https://t.me/innoprog_bot
+
 It has personal accounts for both the `teacher` and the `student`.
 
 **The student can:**

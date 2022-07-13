@@ -1,6 +1,3 @@
-import locale
-from datetime import datetime
-
 from aiogram import Bot, Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message, CallbackQuery, ContentType, InputMediaVideo

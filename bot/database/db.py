@@ -1,8 +1,5 @@
-import sqlite3
 import psycopg2
-from datetime import date, datetime
-from PIL import Image
-import io
+from datetime import datetime
 
 class Database:
     def __init__(self):

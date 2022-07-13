@@ -1,7 +1,6 @@
 from aiogram import Dispatcher, Bot
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message
-from aiogram.utils.exceptions import ChatNotFound
 
 from bot.buttons.buttons import Buttons
 from bot.database.db import Database

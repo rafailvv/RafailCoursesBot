@@ -4,7 +4,7 @@ from aiogram.types import Message
 
 from phonenumbers import parse, is_valid_number
 from bot.buttons.buttons import Buttons
-from bot.message_texts.constans import COURSE_TEXT, COURSES_LIST, CORRECTNESS_PERSONAL_INFO, STUDENT_START_TEXT
+from bot.message_texts.constans import get_text_by_key
 from bot.database.db import Database
 from bot.misc.states import MainStates, PersonalInfo
 
@@ -35,7 +35,7 @@ class Registration:
         if message.text in self.db.get_courses_name():
             course_id, delta = self.db.get_near_course_by_name(message.text)
             await state.update_data(course_id=course_id)
-            await message.answer(text=COURSE_TEXT.format(message.text[2:], delta, self.get_ending_word_day(delta)),
+            await message.answer(text=get_text_by_key('COURSE_TEXT').format(message.text[2:], delta, self.get_ending_word_day(delta)),
                                  reply_markup=self.buttons.in_course(self.db.check_if_is_student(message.chat.id)))
         elif message.text == self.buttons.description_btn.text:
             await message.answer(text=self.db.get_course_full_description(current_data['course_id']))
@@ -52,17 +52,17 @@ class Registration:
             #                        start_parameter="course-payment",
             #                        prices=[LabeledPrice(label="Руб", amount=999 * 100)],
             #                        )
-            await message.answer(text="❗Для оформления заявки заполните пресональные данные учащегося 👇")
+            await message.answer(text="❗Для оформления заявки заполните персональные данные учащегося 👇")
             await message.answer(text="🔡 Введите ФИО учащегося")
             await PersonalInfo.fio.set()
 
 
         elif message.text == self.buttons.back_to_courses_btn.text:
-            await message.answer(text=COURSES_LIST,
+            await message.answer(text=get_text_by_key('COURSES_LIST'),
                                  reply_markup=self.buttons.get_courses_buttons(self.db.check_if_is_student(message.chat.id)))
             await state.update_data(id=None)
         elif message.text == self.buttons.student_account_btn.text:
-            await message.answer(text=STUDENT_START_TEXT.format(self.db.get_student_name_by_chat_id(message.chat.id)),
+            await message.answer(text=get_text_by_key('STUDENT_START_TEXT').format(self.db.get_student_name_by_chat_id(message.chat.id)),
                                  reply_markup=self.buttons.get_flow_for_student(
                                      self.db.get_student_id_by_chat_id(message.chat.id)))
             await state.update_data(flow_id=None)
@@ -99,7 +99,7 @@ class Registration:
                 else:
                     await state.update_data(username=message.text)
                     corr_pi_msg = await message.answer(
-                        text=CORRECTNESS_PERSONAL_INFO.format(data['fio'], data['phone'], message.text),
+                        text=get_text_by_key('CORRECTNESS_PERSONAL_INFO').format(data['fio'], data['phone'], message.text),
                         reply_markup=self.buttons.edit_personal_info())
                     await state.update_data(corr_pi_msg=corr_pi_msg)
                     await PersonalInfo.check_info.set()
@@ -130,7 +130,7 @@ class Registration:
             await self.bot.edit_message_text(
                 chat_id=message.chat.id,
                 message_id=data['corr_pi_msg'].message_id,
-                text=CORRECTNESS_PERSONAL_INFO.format(data['fio'], data['phone'], data['username']),
+                text=get_text_by_key('CORRECTNESS_PERSONAL_INFO').format(data['fio'], data['phone'], data['username']),
                 reply_markup=self.buttons.edit_personal_info())
             await message.answer("Данные успешно изменены!\n\nНажмите кнопку <b>Подтвердить</b> выше, если данные корректны 👆")
 
@@ -142,9 +142,9 @@ class Registration:
     # async def after_payment(self, message: Message, state: FSMContext):
     #     payload_info = message.successful_payment.invoice_payload.split("|")
     #     if payload_info[0] == 'Course':
-    #         await message.answer(text=SUCCESSFUL_PAYMENT_TEXT.format(self.db.get_course_name(int(payload_info[1]))[2:]))
+    #         await message.answer(text.txt=SUCCESSFUL_PAYMENT_TEXT.format(self.db.get_course_name(int(payload_info[1]))[2:]))
     #         await self.bot.send_message(chat_id=ID_RAFAIL,
-    #                                text=SUCCESSFUL_PAYMENT_INFO_FOR_ADMIN.format(message.from_user.full_name,
+    #                                text.txt=SUCCESSFUL_PAYMENT_INFO_FOR_ADMIN.format(message.from_user.full_name,
     #                                                                              message.from_user.username,
     #                                                                              self.db.get_course_name(
     #                                                                                  int(payload_info[1]))[2:]),

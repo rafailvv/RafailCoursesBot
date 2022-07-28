@@ -1,11 +1,10 @@
 from aiogram import Bot, Dispatcher
 from aiogram.dispatcher import FSMContext
-from aiogram.types import Message, CallbackQuery, ContentType, InputMediaVideo
+from aiogram.types import Message, ContentType, InputMediaVideo
 
 from bot.buttons.buttons import Buttons
 from bot.database.db import Database
-from bot.message_texts.constans import SELECTED_FLOW_TEXT, CONNECT_TO_LINK_TEACHER, FLOW_LIST_TEXT, \
-    NOTIFICATION_STUDENT_START_LESSON_TEXT, PERSON_INFO_TEXT, LESSON_RECORDING_FOR_STUDENT_TEXT, REJECTED_HW_TEXT
+from bot.message_texts.constans import get_text_by_key
 from bot.misc.states import MainStates, Recording, SendAll, HomeWork
 
 
@@ -94,18 +93,18 @@ class Teacher:
             start_date, finish_date = dates.split(" - ")[0], dates.split(" - ")[1]
             await state.update_data(flow_id=self.db.get_flow_id_by_course_and_date(course_name, start_date, finish_date,
                                                                                    message.from_user.id))
-            await message.answer(text=SELECTED_FLOW_TEXT.format(message.text[2:]),
+            await message.answer(text=get_text_by_key('SELECTED_FLOW_TEXT').format(message.text[2:]),
                                  reply_markup=self.buttons.in_flow_teacher())
         elif message.text == self.buttons.lesson_link_btn.text:
-            await message.answer(text=CONNECT_TO_LINK_TEACHER,
+            await message.answer(text=get_text_by_key('CONNECT_TO_LINK_TEACHER'),
                                  reply_markup=self.buttons.get_link_to_lesson(state_data['flow_id']))
             for student_chat_id in self.db.get_chat_id_students_in_flow(state_data['flow_id']):
                 await self.bot.send_message(chat_id=student_chat_id[0],
-                                            text=NOTIFICATION_STUDENT_START_LESSON_TEXT,
+                                            text=get_text_by_key('NOTIFICATION_STUDENT_START_LESSON_TEXT'),
                                             reply_markup=self.buttons.get_link_to_lesson(state_data['flow_id']))
         elif message.text == self.buttons.back_to_flow_btn.text:
             await state.update_data(flow_id=None)
-            await message.answer(text=FLOW_LIST_TEXT,
+            await message.answer(text=get_text_by_key('FLOW_LIST_TEXT'),
                                  reply_markup=self.buttons.get_flow_for_teacher(
                                      self.db.get_teacher_id_by_chat_id(message.chat.id)))
 
@@ -129,7 +128,7 @@ class Teacher:
             await MainStates.teacher.set()
         else:
             is_possible = True
-            if message.content_type == "text":
+            if message.content_type == "text.txt":
                 await message.answer(text=message.text, reply_markup=self.buttons.edit_message("SendAll"))
             elif message.content_type == "document":
                 await message.answer_document(document=message.document.file_id,
@@ -163,7 +162,7 @@ class Teacher:
         else:
             is_possible = True
             await state.update_data(content_type=message.content_type)
-            if message.content_type == "text":
+            if message.content_type == "text.txt":
                 await message.answer(text=message.text, reply_markup=self.buttons.edit_message("HW_T"))
                 await state.update_data(content =message.text )
             elif message.content_type == "document":
@@ -207,7 +206,7 @@ class Teacher:
 
         await self.bot.send_message(
             chat_id=self.db.get_student_chat_id_by_hw_id(hw_id),
-            text=REJECTED_HW_TEXT.format(
+            text=get_text_by_key('REJECTED_HW_TEXT').format(
                 self.db.get_teacher_fio_by_hw_id(hw_id),
                 self.db.get_lesson_number_by_hw_id(hw_id),
                 message.text[0].lower() + message.text[1:]

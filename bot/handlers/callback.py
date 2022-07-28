@@ -6,8 +6,7 @@ from aiogram.types import CallbackQuery
 
 from bot.buttons.buttons import Buttons
 from bot.database.db import Database
-from bot.message_texts.constans import REJECTED_TEXT, ACCEPTED_TEXT, BUY_COURSE_TEXT, INFO_FOR_BUY_COURSE, ID_RAFAIL, \
-    PERSON_INFO_TEXT, LESSON_RECORDING_FOR_STUDENT_TEXT, NEW_HW_TEXT, NEW_MSG_TEXT, SOLUTION_HW_TEXT, ACCEPTED_HW_TEXT
+from bot.message_texts.constans import get_text_by_key, ID_RAFAIL
 from bot.misc.states import PersonalInfo, MainStates, Recording, SendAll, HomeWork
 
 
@@ -25,18 +24,18 @@ class Callback:
             await self.bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)
             if data[1] == "Reject":
                 await self.bot.send_message(chat_id=data[2],
-                                            text=REJECTED_TEXT.format(
+                                            text=get_text_by_key('REJECTED_TEXT').format(
                                                 self.db.get_course_name_by_course_id(data[3])[2:]))
                 self.db.update_confirmation(data[4])
             if data[1] == "Accept":
                 if self.db.get_student_chat_id_by_id(data[4]) is not None:
                     await self.bot.send_message(chat_id=data[2],
-                                                text=ACCEPTED_TEXT.format(
+                                                text=get_text_by_key('ACCEPTED_TEXT').format(
                                                     self.db.get_course_name_by_course_id(data[3])[2:]),
                                                 reply_markup=self.buttons.get_button_to_student_page())
                 else:
                     await self.bot.send_message(chat_id=data[2],
-                                                text=ACCEPTED_TEXT.format(
+                                                text=get_text_by_key('ACCEPTED_TEXT').format(
                                                     self.db.get_course_name_by_course_id(data[3])[2:]))
                 self.db.update_confirmation(data[4], True)
 
@@ -63,11 +62,11 @@ class Callback:
                                     self.db.get_near_course_flow_by_course_id(state_data['course_id']), chat_id)
 
                 await callback.message.answer(
-                    text=BUY_COURSE_TEXT.format(self.db.get_course_name_by_course_id(state_data['course_id'])[2:]))
+                    text=get_text_by_key('BUY_COURSE_TEXT').format(self.db.get_course_name_by_course_id(state_data['course_id'])[2:]))
 
                 await self.bot.send_message(
                     chat_id=ID_RAFAIL,
-                    text=INFO_FOR_BUY_COURSE.format(
+                    text=get_text_by_key('INFO_FOR_BUY_COURSE').format(
                         callback.message.chat.username,
                         self.db.get_course_name_by_course_id(state_data['course_id'])[2:],
                         state_data['fio'],
@@ -97,14 +96,14 @@ class Callback:
                 for student_chat_id in self.db.get_students_chat_id_in_flow(data_state['flow_id']):
                     await self.bot.send_video(chat_id=student_chat_id[0],
                                               video=data_state['video_id'],
-                                              caption=LESSON_RECORDING_FOR_STUDENT_TEXT.format(
+                                              caption=get_text_by_key('LESSON_RECORDING_FOR_STUDENT_TEXT').format(
                                                   datetime.now().strftime("%d.%m"),
                                                   self.db.get_course_name_by_course_id(data_state['flow_id'])[2:],
                                                   lesson_number, data_state['description']))
         elif data[0] == "Student":
             student_id = data[1]
             fio, username, phone = self.db.get_student_info(student_id)
-            await callback.message.answer(text=PERSON_INFO_TEXT.format("👨‍🎓", fio, username, phone))
+            await callback.message.answer(text=get_text_by_key('PERSON_INFO_TEXT').format("👨‍🎓", fio, username, phone))
 
         elif data[0] == "SendAll":
 
@@ -134,8 +133,8 @@ class Callback:
                     student_chat_id = student_chat_id[0]
                     await self.bot.send_message(
                         chat_id=student_chat_id,
-                        text=NEW_MSG_TEXT.format(self.db.get_fio_teacher_by_chat_id(callback.message.chat.id)))
-                    if message.content_type == "text":
+                        text=get_text_by_key('NEW_MSG_TEXT').format(self.db.get_fio_teacher_by_chat_id(callback.message.chat.id)))
+                    if message.content_type == "text.txt":
                         await self.bot.send_message(
                             chat_id=student_chat_id,
                             text=message.text)
@@ -170,7 +169,7 @@ class Callback:
             await self.bot.send_video(
                 chat_id=callback.message.chat.id,
                 video=recording,
-                caption=LESSON_RECORDING_FOR_STUDENT_TEXT.format(lesson_date, course_name[2:],
+                caption=get_text_by_key('LESSON_RECORDING_FOR_STUDENT_TEXT').format(lesson_date, course_name[2:],
                                                                  lesson_number, description))
 
         elif data[0] == "HW_T":
@@ -263,7 +262,7 @@ class Callback:
                     )
                     await self.bot.send_message(
                         chat_id=student_chat_id[0],
-                        text=NEW_HW_TEXT.format(
+                        text=get_text_by_key('NEW_HW_TEXT').format(
                             self.db.get_fio_teacher_by_chat_id(callback.message.chat.id),
                             state_data['num_les']
                         ),
@@ -291,7 +290,7 @@ class Callback:
                     content = content[0]
                     caption = ""
                 message = callback.message
-                if content_type == "text":
+                if content_type == "text.txt":
                     await self.bot.send_message(
                         chat_id=message.chat.id,
                         text=content,
@@ -335,7 +334,7 @@ class Callback:
 
                     await self.bot.send_message(
                         chat_id=self.db.get_student_chat_id_by_hw_id(hw_id),
-                        text=ACCEPTED_HW_TEXT.format(
+                        text=get_text_by_key('ACCEPTED_HW_TEXT').format(
                             self.db.get_teacher_fio_by_hw_id(hw_id),
                             self.db.get_lesson_number_by_hw_id(hw_id)
                         )
@@ -355,15 +354,6 @@ class Callback:
 
                     await HomeWork.comment.set()
                     await state.update_data(hw_id = hw_id)
-                    # await self.bot.send_message(
-                    #     chat_id=self.db.get_student_chat_id_by_hw_id(hw_id),
-                    #     text=REJECTED_HW_TEXT.format(
-                    #         self.db.get_teacher_fio_by_hw_id(hw_id),
-                    #         self.db.get_lesson_number_by_hw_id(hw_id)
-                    #     )
-                    # )
-
-
 
 
         elif data[0] == "HW_S":
@@ -382,7 +372,7 @@ class Callback:
                     content = content[0]
                     caption = ""
                 message = callback.message
-                if content_type == "text":
+                if content_type == "text.txt":
                     await self.bot.send_message(
                         chat_id=message.chat.id,
                         text=content,
@@ -424,7 +414,7 @@ class Callback:
 
                 await self.bot.send_message(
                     chat_id=callback.message.chat.id,
-                    text="👨‍💻 Отправь выполненное задание",
+                    text="👨‍💻 Отправь сюда выполненное задание",
                 )
                 await HomeWork.for_confirmation.set()
 
@@ -455,7 +445,7 @@ class Callback:
 
                 await self.bot.send_message(
                     chat_id=self.db.get_teacher_chat_id_by_hw_id(state_data['hw_id']),
-                    text=SOLUTION_HW_TEXT.format(
+                    text=get_text_by_key('SOLUTION_HW_TEXT').format(
                         self.db.get_student_fio_by_hw_id(state_data['hw_id']),
                         self.db.get_lesson_number_by_hw_id(state_data['hw_id'])
                     ),

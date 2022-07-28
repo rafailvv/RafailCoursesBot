@@ -144,7 +144,7 @@ class Buttons:
 
     def message_types(self):
         buttons = InlineKeyboardMarkup(row_width=2)
-        buttons.insert(InlineKeyboardButton(text="📝 Текст 📝", callback_data="SendAll|text"))
+        buttons.insert(InlineKeyboardButton(text="📝 Текст 📝", callback_data="SendAll|text.txt"))
         buttons.insert(InlineKeyboardButton(text="✉ Документ ✉", callback_data="SendAll|document"))
         buttons.insert(InlineKeyboardButton(text="🖼 Картнику 🖼", callback_data="SendAll|image"))
         buttons.insert(InlineKeyboardButton(text="🎞 Видеозапись 🎞", callback_data="SendAll|video"))

@@ -4,8 +4,7 @@ from aiogram.types import Message, ContentType
 
 from bot.buttons.buttons import Buttons
 from bot.database.db import Database
-from bot.message_texts.constans import STUDENT_START_TEXT, SELECTED_FLOW_TEXT, FLOW_LIST_TEXT, TIMETABLE_TEXT, \
-    COURSES_LIST, PERSON_INFO_TEXT, CONNECT_TO_LINK_STUDENT, FEEDBACK_TEXT
+from bot.message_texts.constans import get_text_by_key
 from bot.misc.states import MainStates, HomeWork
 
 
@@ -23,7 +22,7 @@ class Student:
     async def text_handler(self, message : Message, state : FSMContext):
         state_data = await state.get_data()
         if message.text == self.buttons.back_to_courses_btn.text:
-            await message.answer(text=COURSES_LIST,
+            await message.answer(text=get_text_by_key('COURSES_LIST'),
                                  reply_markup=self.buttons.get_courses_buttons(True))
             await state.update_data(id=None)
             await MainStates.registration.set()
@@ -32,18 +31,18 @@ class Student:
             start_date, finish_date = dates.split(" - ")[0], dates.split(" - ")[1]
             flow_id = self.db.get_flow_id_by_course_and_date(course_name, start_date, finish_date, message.from_user.id)
             await state.update_data(flow_id=flow_id)
-            await message.answer(text=TIMETABLE_TEXT.format(self.db.get_timetable_by_flow_id(flow_id)),
+            await message.answer(text=get_text_by_key('TIMETABLE_TEXT').format(self.db.get_timetable_by_flow_id(flow_id)),
                                  reply_markup=self.buttons.in_flow_student())
         elif message.text == self.buttons.back_to_flow_btn.text:
             await state.update_data(flow_id=None)
-            await message.answer(text=FLOW_LIST_TEXT,
+            await message.answer(text=get_text_by_key('FLOW_LIST_TEXT'),
                                  reply_markup=self.buttons.get_flow_for_student(
                                      self.db.get_student_id_by_chat_id(message.chat.id)))
         elif message.text == self.buttons.teacher_info_btn.text:
             fio, username, phone = self.db.get_teacher_info(state_data['flow_id'])
-            await message.answer(text=PERSON_INFO_TEXT.format("👨‍🏫", fio, username, phone))
+            await message.answer(text=get_text_by_key('PERSON_INFO_TEXT').format("👨‍🏫", fio, username, phone))
         elif message.text == self.buttons.lesson_link_btn.text:
-            await message.answer(text=CONNECT_TO_LINK_STUDENT,
+            await message.answer(text=get_text_by_key('CONNECT_TO_LINK_STUDENT'),
                                  reply_markup=self.buttons.get_link_to_lesson(state_data['flow_id']))
         elif message.text == self.buttons.lesson_video_btn.text:
             buttons = self.buttons.get_recorded_lessons(state_data['flow_id'])
@@ -62,7 +61,7 @@ class Student:
             else:
                 await message.answer(text="🥳 Нет невыполненных домашних работ ")
         elif message.text == self.buttons.feedback_btn.text:
-            await message.answer(text=FEEDBACK_TEXT)
+            await message.answer(text=get_text_by_key('FEEDBACK_TEXT'))
         else:
             await message.answer("К сожалению, я тебя не понимаю 😢")
 
@@ -75,7 +74,7 @@ class Student:
         else:
             is_possible = True
             await state.update_data(content_type=message.content_type)
-            if message.content_type == "text":
+            if message.content_type == "text.txt":
                 await message.answer(text=message.text, reply_markup=self.buttons.edit_message("HW_S"))
                 await state.update_data(content=message.text)
             elif message.content_type == "document":

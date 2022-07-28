@@ -339,10 +339,11 @@ class Database:
         self.db.commit()
 
     def add_user_if_not_exits(self, chat_id, username):
-        self.cur.execute(f"SELECT id FROM all_users WHERE chat_id = {chat_id}")
-        if self.cur.fetchone() is None:
-            self.cur.execute(f"INSERT INTO all_users(chat_id, username) VALUES ({chat_id}, '@{username}')")
-            self.db.commit()
+        self.cur.execute(f"""
+            INSERT INTO all_users(chat_id, username) 
+            SELECT {chat_id}, '@{username}'
+            WHERE NOT EXISTS (SELECT id FROM all_users WHERE chat_id = {chat_id})""")
+        self.db.commit()
 
     def delete_user(self, chat_id):
         self.cur.execute(f"DELETE FROM all_users WHERE chat_id = {chat_id}")
